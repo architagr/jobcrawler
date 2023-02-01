@@ -2,31 +2,41 @@ package main
 
 import (
 	"fmt"
-	"jobcrawler/crawler/linkedin"
-	"jobcrawler/link"
+	"jobcrawler/urlfrontier"
+	"jobcrawler/urlseeding"
 )
 
 func main() {
 	crawlLinkedIn()
 }
 func crawlLinkedIn() {
-	search := &link.SearchCondition{
-		HostName: link.HostName_Linkedin,
-		JobTitle: "Software Engineer",
-		LocationInfo: link.Location{
+	search := &urlseeding.SearchCondition{
+		JobTitle: urlseeding.JobTitle_SoftwareEngineer,
+		LocationInfo: urlseeding.Location{
 			Country: "United States",
 			City:    "New York",
 		},
-		JobType:     link.JobType_FullTime,
-		JobLocation: link.JobLocation_OnSite,
+		JobType:  urlseeding.JobType_FullTime,
+		JobModel: urlseeding.JobModel_OnSite,
 	}
-	search.GetAllLinks()
-	crawler := linkedin.InitLinkedInCrawler(search)
-	crawler.StartCrawler()
+	urlSeeding := urlseeding.InitUrlSeeding()
+	linksToCrawl := urlSeeding.GetLinks(search)
+	frontier := urlfrontier.InitUrlFrontier(search, linksToCrawl)
 	fmt.Println("*******")
-	links := crawler.GetJobLinks()
-	for _, link := range links.Links {
-		fmt.Println(link)
+	frontier.Start(worker)
+	fmt.Println("*******")
+	// crawler := linkedin.InitLinkedInCrawler(search)
+	// crawler.StartCrawler()
+	// fmt.Println("*******")
+	// links := crawler.GetJobLinks()
+	// for _, link := range links.Links {
+	// 	fmt.Println(link)
+	// }
+	// fmt.Println("******")
+}
+
+func worker(search *urlseeding.SearchCondition, hostname urlseeding.HostName, ch <-chan string) {
+	for url := range ch {
+		fmt.Println(hostname, search, url)
 	}
-	fmt.Println("******")
 }
