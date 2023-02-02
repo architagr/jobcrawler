@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"jobcrawler/notification"
 	"jobcrawler/urlfrontier"
 	"jobcrawler/urlseeding"
+	"log"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -19,23 +20,21 @@ func crawlLinkedIn() {
 			Country: "United States",
 			City:    "New York",
 		},
-		JobType:  urlseeding.JobType_FullTime,
-		JobModel: urlseeding.JobModel_OnSite,
+		RoleName:   urlseeding.Role_Engineering,
+		JobType:    urlseeding.JobType_FullTime,
+		JobModel:   urlseeding.JobModel_OnSite,
+		Experience: urlseeding.ExperienceLevel_EntryLevel,
 	}
+	start := time.Now()
+
 	wg := sync.WaitGroup{}
 	urlSeeding := urlseeding.InitUrlSeeding()
 	linksToCrawl := urlSeeding.GetLinks(search)
 	frontier := urlfrontier.InitUrlFrontier(search, linksToCrawl, notification)
-	fmt.Println("*******")
+	log.Println("*******")
 	frontier.Start(&wg)
 
-	fmt.Println("*******")
-	// crawler := linkedin.InitLinkedInCrawler(search)
-	// crawler.StartCrawler()
-	// fmt.Println("*******")
-	// links := crawler.GetJobLinks()
-	// for _, link := range links.Links {
-	// 	fmt.Println(link)
-	// }
-	// fmt.Println("******")
+	log.Println("*******")
+	end := time.Now()
+	log.Println(end.Sub(start))
 }
