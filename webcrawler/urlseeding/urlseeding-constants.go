@@ -5,11 +5,20 @@ type JobType string
 type JobModel string
 type Role string
 type JobTitle string
+type ExperienceLevel string
 
 const (
 	HostName_Linkedin HostName = "www.linkedin.com"
 	HostName_Indeed   HostName = "www.indeed.com"
 )
+const (
+	ExperienceLevel_EntryLevel     = "Entry Level"
+	ExperienceLevel_Internship     = "Internship"
+	ExperienceLevel_Associate      = "Associate"
+	ExperienceLevel_MidSeniorLevel = "Mid-Senior Level"
+	ExperienceLevel_Director       = "Director"
+)
+
 const (
 	JobType_FullTime   JobType = "Full Time"
 	JobType_PartTime   JobType = "Part Time"
@@ -19,6 +28,7 @@ const (
 	JobType_Internship JobType = "Internship"
 	JobType_Other      JobType = "Other"
 )
+
 const (
 	JobModel_OnSite JobModel = "On site"
 	JobModel_Remote JobModel = "Remote"

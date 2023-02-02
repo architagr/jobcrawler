@@ -5,11 +5,12 @@ type Location struct {
 	City    string `json:"city,omitempty"`
 }
 type SearchCondition struct {
-	JobTitle     JobTitle `json:"jobTitle,omitempty"`
-	LocationInfo Location `json:"locationInfo,omitempty"`
-	JobType      JobType  `json:"jobType,omitempty"`
-	JobModel     JobModel `json:"jobLocation,omitempty"`
-	RoleName     Role     `json:"roleName,omitempty"`
+	JobTitle     JobTitle        `json:"jobTitle,omitempty"`
+	LocationInfo Location        `json:"locationInfo,omitempty"`
+	JobType      JobType         `json:"jobType,omitempty"`
+	JobModel     JobModel        `json:"jobLocation,omitempty"`
+	RoleName     Role            `json:"roleName,omitempty"`
+	Experience   ExperienceLevel `json:"experience,omitempty"`
 }
 
 type CrawlerLinks struct {
