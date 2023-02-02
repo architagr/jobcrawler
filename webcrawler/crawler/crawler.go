@@ -1,14 +1,14 @@
 package crawler
 
 import (
-	"jobcrawler/link"
+	"sync"
 
 	"github.com/gocolly/colly/v2"
 )
 
 type ICrawler interface {
-	StartCrawler()
-	GetJobLinks() *link.SearchCondition
+	StartCrawler(wg *sync.WaitGroup)
+	GetJobLinks() []string
 }
 
 var (
