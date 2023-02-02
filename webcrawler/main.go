@@ -2,14 +2,17 @@ package main
 
 import (
 	"fmt"
+	"jobcrawler/notification"
 	"jobcrawler/urlfrontier"
 	"jobcrawler/urlseeding"
+	"sync"
 )
 
 func main() {
 	crawlLinkedIn()
 }
 func crawlLinkedIn() {
+	notification := new(notification.Notification)
 	search := &urlseeding.SearchCondition{
 		JobTitle: urlseeding.JobTitle_SoftwareEngineer,
 		LocationInfo: urlseeding.Location{
@@ -19,11 +22,13 @@ func crawlLinkedIn() {
 		JobType:  urlseeding.JobType_FullTime,
 		JobModel: urlseeding.JobModel_OnSite,
 	}
+	wg := sync.WaitGroup{}
 	urlSeeding := urlseeding.InitUrlSeeding()
 	linksToCrawl := urlSeeding.GetLinks(search)
-	frontier := urlfrontier.InitUrlFrontier(search, linksToCrawl)
+	frontier := urlfrontier.InitUrlFrontier(search, linksToCrawl, notification)
 	fmt.Println("*******")
-	frontier.Start(worker)
+	frontier.Start(&wg)
+
 	fmt.Println("*******")
 	// crawler := linkedin.InitLinkedInCrawler(search)
 	// crawler.StartCrawler()
@@ -33,10 +38,4 @@ func crawlLinkedIn() {
 	// 	fmt.Println(link)
 	// }
 	// fmt.Println("******")
-}
-
-func worker(search *urlseeding.SearchCondition, hostname urlseeding.HostName, ch <-chan string) {
-	for url := range ch {
-		fmt.Println(hostname, search, url)
-	}
 }

@@ -12,20 +12,11 @@ func (urlSeeding *UrlSeeding) GetLinks(search *SearchCondition) []CrawlerLinks {
 
 	return []CrawlerLinks{
 		{
-			HostName:      HostName_Linkedin,
-			RatePerSecond: 1,
+			HostName:            HostName_Linkedin,
+			DelayInMilliseconds: 500,
 			Links: []string{
 				"https://www.linkedin.com/jobs/search?keywords=Google&location=United%20States&locationId=&geoId=103644278&sortBy=R&f_TPR=&f_PP=102571732&position=1&pageNum=0",
 				// "https://www.linkedin.com/jobs/search?keywords=Software%20Engineer&location=United%20States&locationId=&geoId=103644278&f_TPR=&f_PP=102571732&f_JT=F&f_E=2&f_WT=1&position=1&pageNum=0",
-			},
-		},
-		{
-			HostName:      HostName_Indeed,
-			RatePerSecond: 1,
-			Links: []string{
-				"indeed1",
-				"indeed2",
-				"indeed3",
 			},
 		},
 	}
