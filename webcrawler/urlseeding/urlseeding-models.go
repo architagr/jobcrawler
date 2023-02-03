@@ -14,7 +14,12 @@ type SearchCondition struct {
 }
 
 type CrawlerLinks struct {
-	HostName            HostName `json:"hostName"`
-	DelayInMilliseconds int      `json:"delayInMilliseconds"`
-	Links               []string `json:"links"`
+	DelayInMilliseconds int    `json:"delayInMilliseconds"`
+	Parallisim          int    `json:"parallisim"`
+	Links               []Link `json:"links"`
+}
+
+type Link struct {
+	Url        string `json:"url"`
+	RetryCount int    `json:"retryCount"`
 }

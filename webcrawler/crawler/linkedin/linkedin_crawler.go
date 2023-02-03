@@ -2,52 +2,55 @@ package linkedin
 
 import (
 	"jobcrawler/crawler"
+	"jobcrawler/notification"
 	"jobcrawler/urlseeding"
 	"log"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 )
 
 type LinkedinCrawler struct {
-	collector      *colly.Collector
-	queue          *queue.Queue
-	search         urlseeding.SearchCondition
-	crawlableLinks urlseeding.CrawlerLinks
-	jobLinks       []string
-	logger         *log.Logger
-	errorLinks     []string
-	retryCount     int
+	collector    *colly.Collector
+	queue        *queue.Queue
+	search       urlseeding.SearchCondition
+	jobLinks     []string
+	logger       *log.Logger
+	errorLinks   []string
+	retryCount   int
+	notification *notification.Notification
 }
 
-func InitLinkedInCrawler(search urlseeding.SearchCondition, links urlseeding.CrawlerLinks) crawler.ICrawler {
+func InitLinkedInCrawler(search urlseeding.SearchCondition, notification *notification.Notification) crawler.ICrawler {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
 		crawler.UserAgent,
 		crawler.MaxDepth,
 		colly.AllowURLRevisit(),
 	)
-	c.Limit(&colly.LimitRule{
-		Parallelism: 2,
-		Delay:       time.Duration(links.DelayInMilliseconds) * time.Millisecond,
-		RandomDelay: time.Duration(links.DelayInMilliseconds) * time.Millisecond,
-	})
+
 	q, _ := getQueue()
 	logger := log.Default()
 	logger.SetFlags(log.Lmicroseconds)
-	return &LinkedinCrawler{
-		collector:      c,
-		queue:          q,
-		search:         search,
-		crawlableLinks: links,
-		jobLinks:       []string{},
-		logger:         logger,
-		errorLinks:     []string{},
-		retryCount:     5,
+
+	linkedinCrawler := &LinkedinCrawler{
+		collector:    c,
+		queue:        q,
+		search:       search,
+		jobLinks:     []string{},
+		logger:       logger,
+		errorLinks:   []string{},
+		retryCount:   5,
+		notification: notification,
 	}
+
+	linkedinCrawler.collector.OnRequest(linkedinCrawler.onRequest)
+	linkedinCrawler.collector.OnError(linkedinCrawler.onError)
+	linkedinCrawler.collector.OnHTML("a[href]", linkedinCrawler.onHtml)
+	linkedinCrawler.collector.OnResponse(linkedinCrawler.onResponse)
+
+	return linkedinCrawler
 }
 func getQueue() (*queue.Queue, error) {
 	return queue.New(
@@ -55,28 +58,31 @@ func getQueue() (*queue.Queue, error) {
 		&queue.InMemoryQueueStorage{MaxSize: 10000}, // Use default queue storage
 	)
 }
-func (crawler *LinkedinCrawler) StartCrawler(wg *sync.WaitGroup) {
-	defer wg.Done()
-	crawler.collector.OnRequest(crawler.onRequest)
-	crawler.collector.OnError(crawler.onError)
-	crawler.collector.OnHTML("a[href]", crawler.onHtml)
-	crawler.collector.OnResponse(crawler.onResponse)
-	for _, listingLink := range crawler.crawlableLinks.Links {
-		crawler.queue.AddURL(listingLink)
+func (crawler *LinkedinCrawler) StartCrawler(links []urlseeding.Link) []string {
+	crawler.errorLinks = []string{}
+	crawler.jobLinks = []string{}
 
+	queue, _ := getQueue()
+	for _, listingLink := range links {
+		queue.AddURL(listingLink.Url)
+		// crawler.collector.Visit(listingLink)
 	}
-	crawler.queue.Run(crawler.collector)
-	for crawler.retryCount > 0 && len(crawler.errorLinks) > 0 {
-		time.Sleep(10 * time.Second)
-		links := make([]string, 0)
-		links = append(links, crawler.errorLinks...)
-		crawler.errorLinks = []string{}
-		crawler.retryCount--
-		for _, listingLink := range links {
-			crawler.collector.Visit(listingLink)
-		}
-		crawler.collector.Wait()
-	}
+	queue.Run(crawler.collector)
+	// crawler.collector.Wait()
+	// for crawler.retryCount > 0 && len(crawler.errorLinks) > 0 {
+	// 	time.Sleep(10 * time.Second)
+	// 	links := make([]string, 0)
+	// 	links = append(links, crawler.errorLinks...)
+	// 	crawler.errorLinks = []string{}
+	// 	crawler.retryCount--
+	// 	for _, listingLink := range links {
+	// 		crawler.collector.Visit(listingLink)
+	// 	}
+	// 	crawler.collector.Wait()
+	// }
+	crawler.notification.SendUrlNotificationToScrapper(&crawler.search, urlseeding.HostName_Linkedin, crawler.jobLinks)
+	return crawler.errorLinks
+
 }
 func (crawler *LinkedinCrawler) GetJobLinks() []string {
 	return crawler.jobLinks
