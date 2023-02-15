@@ -17,8 +17,8 @@ import (
 )
 
 func main() {
-	setupDB()
-	//crawlLinkedIn()
+	// setupDB()
+	crawlLinkedIn()
 }
 func crawlLinkedIn() {
 	notification := new(notification.Notification)
