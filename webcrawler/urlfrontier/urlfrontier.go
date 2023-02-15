@@ -48,6 +48,7 @@ func (urlFrontier *UrlFrontier) Start(wg *sync.WaitGroup) {
 func (urlFrontier *UrlFrontier) worker(crawleLinks urlseeding.CrawlerLinks, crawler crawler.ICrawler, wg *sync.WaitGroup) {
 	defer wg.Done()
 	i := 0
+	initialCount := len(crawleLinks.Links)
 	for i < len(crawleLinks.Links) {
 		var links []urlseeding.Link
 		end := i + crawleLinks.Parallisim
@@ -65,6 +66,9 @@ func (urlFrontier *UrlFrontier) worker(crawleLinks urlseeding.CrawlerLinks, craw
 			}
 		}
 		i = end
+		if initialCount < i {
+			crawleLinks.DelayInMilliseconds *= 2
+		}
 		time.Sleep(time.Duration(crawleLinks.DelayInMilliseconds) * time.Millisecond)
 	}
 }
