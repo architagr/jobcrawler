@@ -1,4 +1,4 @@
-module repository
+module github.com/architagr/repository
 
 go 1.19
 
