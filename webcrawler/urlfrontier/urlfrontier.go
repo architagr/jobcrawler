@@ -7,21 +7,24 @@ import (
 	"jobcrawler/urlseeding"
 	"sync"
 	"time"
+
+	"github.com/architagr/common-constants/constants"
+	searchcondition "github.com/architagr/common-models/search-condition"
 )
 
 type UrlFrontier struct {
-	searchParams *urlseeding.SearchCondition
-	links        map[urlseeding.HostName]urlseeding.CrawlerLinks
-	workers      map[urlseeding.HostName]crawler.ICrawler
+	searchParams *searchcondition.SearchCondition
+	links        map[constants.HostName]urlseeding.CrawlerLinks
+	workers      map[constants.HostName]crawler.ICrawler
 	notification *notification.Notification
 }
 
-func InitUrlFrontier(searchParams *urlseeding.SearchCondition, links map[urlseeding.HostName]urlseeding.CrawlerLinks, notifier *notification.Notification) *UrlFrontier {
-	workers := make(map[urlseeding.HostName]crawler.ICrawler)
+func InitUrlFrontier(searchParams *searchcondition.SearchCondition, links map[constants.HostName]urlseeding.CrawlerLinks, notifier *notification.Notification) *UrlFrontier {
+	workers := make(map[constants.HostName]crawler.ICrawler)
 	for hostname := range links {
 		var crawler crawler.ICrawler
 		switch hostname {
-		case urlseeding.HostName_Linkedin:
+		case constants.HostName_Linkedin:
 			crawler = linkedin.InitLinkedInCrawler(*searchParams, notifier)
 		}
 		workers[hostname] = crawler
@@ -48,6 +51,7 @@ func (urlFrontier *UrlFrontier) Start(wg *sync.WaitGroup) {
 func (urlFrontier *UrlFrontier) worker(crawleLinks urlseeding.CrawlerLinks, crawler crawler.ICrawler, wg *sync.WaitGroup) {
 	defer wg.Done()
 	i := 0
+	initialCount := len(crawleLinks.Links)
 	for i < len(crawleLinks.Links) {
 		var links []urlseeding.Link
 		end := i + crawleLinks.Parallisim
@@ -65,6 +69,9 @@ func (urlFrontier *UrlFrontier) worker(crawleLinks urlseeding.CrawlerLinks, craw
 			}
 		}
 		i = end
+		if initialCount < i {
+			crawleLinks.DelayInMilliseconds *= 2
+		}
 		time.Sleep(time.Duration(crawleLinks.DelayInMilliseconds) * time.Millisecond)
 	}
 }

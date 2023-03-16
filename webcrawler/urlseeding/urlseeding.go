@@ -1,6 +1,11 @@
 package urlseeding
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/architagr/common-constants/constants"
+	searchcondition "github.com/architagr/common-models/search-condition"
+)
 
 type UrlSeeding struct {
 }
@@ -9,7 +14,7 @@ func InitUrlSeeding() *UrlSeeding {
 	return &UrlSeeding{}
 }
 
-func (urlSeeding *UrlSeeding) GetLinks(search *SearchCondition) map[HostName]CrawlerLinks {
+func (urlSeeding *UrlSeeding) GetLinks(search *searchcondition.SearchCondition) map[constants.HostName]CrawlerLinks {
 	// TODO: get all links basd on search condition from db
 	retryCount := 5
 	links := make([]Link, 0, 40)
@@ -23,8 +28,8 @@ func (urlSeeding *UrlSeeding) GetLinks(search *SearchCondition) map[HostName]Cra
 			RetryCount: retryCount,
 		})
 	}
-	return map[HostName]CrawlerLinks{
-		HostName_Linkedin: {
+	return map[constants.HostName]CrawlerLinks{
+		constants.HostName_Linkedin: {
 			DelayInMilliseconds: 1000,
 			Parallisim:          4,
 			Links:               links,
