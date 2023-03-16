@@ -13,6 +13,7 @@ import (
 type IConnection interface {
 	ValidateConnection() error
 	GetConnction() (*mongo.Client, context.Context, error)
+	Disconnect() error
 }
 
 var mongoClient *mongo.Client
@@ -34,6 +35,9 @@ func (conn *Connection) validateConnectionParams() error {
 		return fmt.Errorf("connection params not set")
 	}
 	return nil
+}
+func (conn *Connection) Disconnect() error {
+	return mongoClient.Disconnect(contextObj)
 }
 func (conn *Connection) ValidateConnection() error {
 	err := conn.validateConnectionParams()
