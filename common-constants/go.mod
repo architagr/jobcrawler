@@ -1,17 +1,8 @@
-module scrapper
+module github.com/architagr/common-constants
 
 go 1.20
 
-require (
-	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
-	github.com/architagr/common-models v0.0.0-00010101000000-000000000000
-	github.com/gocolly/colly/v2 v2.1.0
-)
-
-replace (
-	github.com/architagr/common-constants => /Users/architagarwal/code/jobcrawler/common-constants
-	github.com/architagr/common-models => /Users/architagarwal/code/jobcrawler/common-models
-)
+require github.com/gocolly/colly/v2 v2.1.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect
