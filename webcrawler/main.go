@@ -8,25 +8,27 @@ import (
 	"sync"
 	"time"
 
+	"github.com/architagr/common-constants/constants"
+	searchcondition "github.com/architagr/common-models/search-condition"
 	"github.com/architagr/repository/connection"
 )
 
 func main() {
-	setupDB()
-	//crawlLinkedIn()
+	//setupDB()
+	crawlLinkedIn()
 }
 func crawlLinkedIn() {
 	notification := new(notification.Notification)
-	search := &urlseeding.SearchCondition{
-		JobTitle: urlseeding.JobTitle_SoftwareEngineer,
-		LocationInfo: urlseeding.Location{
+	search := &searchcondition.SearchCondition{
+		JobTitle: constants.JobTitle_SoftwareEngineer,
+		LocationInfo: searchcondition.Location{
 			Country: "United States",
 			City:    "New York",
 		},
-		RoleName:   urlseeding.Role_Engineering,
-		JobType:    urlseeding.JobType_FullTime,
-		JobModel:   urlseeding.JobModel_OnSite,
-		Experience: urlseeding.ExperienceLevel_EntryLevel,
+		RoleName:   constants.Role_Engineering,
+		JobType:    constants.JobType_FullTime,
+		JobModel:   constants.JobModel_OnSite,
+		Experience: constants.ExperienceLevel_EntryLevel,
 	}
 	start := time.Now()
 

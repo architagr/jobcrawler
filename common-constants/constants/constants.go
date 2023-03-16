@@ -1,4 +1,6 @@
-package urlseeding
+package constants
+
+import "github.com/gocolly/colly/v2"
 
 type HostName string
 type JobType string
@@ -69,4 +71,9 @@ const (
 	JobTitle_JavaSoftwareEngineer            JobTitle = "Java Software Engineer"
 	JobTitle_SeniorSoftwareEngineer          JobTitle = "Senior Software Engineer"
 	JobTitle_FullStackEngineer               JobTitle = "Full Stack Engineer"
+)
+
+var (
+	UserAgent = colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15")
+	MaxDepth  = colly.MaxDepth(1)
 )

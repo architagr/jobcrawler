@@ -7,6 +7,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/architagr/common-constants/constants"
+	searchcondition "github.com/architagr/common-models/search-condition"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 )
@@ -14,7 +16,7 @@ import (
 type LinkedinCrawler struct {
 	collector    *colly.Collector
 	queue        *queue.Queue
-	search       urlseeding.SearchCondition
+	search       searchcondition.SearchCondition
 	jobLinks     []string
 	logger       *log.Logger
 	errorLinks   []string
@@ -22,11 +24,11 @@ type LinkedinCrawler struct {
 	notification *notification.Notification
 }
 
-func InitLinkedInCrawler(search urlseeding.SearchCondition, notification *notification.Notification) crawler.ICrawler {
+func InitLinkedInCrawler(search searchcondition.SearchCondition, notification *notification.Notification) crawler.ICrawler {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
-		crawler.UserAgent,
-		crawler.MaxDepth,
+		constants.UserAgent,
+		constants.MaxDepth,
 		colly.AllowURLRevisit(),
 	)
 
@@ -80,7 +82,7 @@ func (crawler *LinkedinCrawler) StartCrawler(links []urlseeding.Link) []string {
 	// 	}
 	// 	crawler.collector.Wait()
 	// }
-	crawler.notification.SendUrlNotificationToScrapper(&crawler.search, urlseeding.HostName_Linkedin, crawler.jobLinks)
+	crawler.notification.SendUrlNotificationToScrapper(&crawler.search, constants.HostName_Linkedin, crawler.jobLinks)
 	return crawler.errorLinks
 
 }
