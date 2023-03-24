@@ -6,6 +6,7 @@ require (
 	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
 	github.com/architagr/common-models v0.0.0-00010101000000-000000000000
 	github.com/architagr/repository v0.0.0-00010101000000-000000000000
+	github.com/aws/aws-sdk-go v1.44.228
 	github.com/gocolly/colly/v2 v2.1.0
 )
 
@@ -25,6 +26,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
