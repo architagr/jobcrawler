@@ -3,25 +3,28 @@ package config
 import "os"
 
 type Config struct {
-	scrapperUrl string
+	scrapperSnsTopic string
 }
 
 var env *Config
 
 const (
-	scrapperUrlKey = "ScrapperQueueUrl"
+	scrapperSnsTopicArnKey = "ScrapperSnsTopicArn"
 )
 
 func InitConfig() {
 	env = &Config{
-		scrapperUrl: os.Getenv(scrapperUrlKey),
+		scrapperSnsTopic: os.Getenv(scrapperSnsTopicArnKey),
 	}
 }
 
 func GetConfig() *Config {
+	if env == nil {
+		InitConfig()
+	}
 	return env
 }
 
-func (e *Config) GetScrapperQueueUrl() string {
-	return e.scrapperUrl
+func (e *Config) GetScrapperSnsTopicArn() string {
+	return e.scrapperSnsTopic
 }

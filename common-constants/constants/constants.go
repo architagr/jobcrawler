@@ -10,8 +10,8 @@ type JobTitle string
 type ExperienceLevel string
 
 const (
-	HostName_Linkedin HostName = "www.linkedin.com"
-	HostName_Indeed   HostName = "www.indeed.com"
+	HostName_Linkedin HostName = "linkedin"
+	HostName_Indeed   HostName = "indeed"
 )
 const (
 	ExperienceLevel_EntryLevel     = "Entry Level"

@@ -9,11 +9,12 @@ import (
 	searchcondition "github.com/architagr/common-models/search-condition"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/jsii-runtime-go"
 )
 
 type Notification struct {
-	sqs *sqs.SQS
+	sns *sns.SNS
 }
 
 var notification *Notification
@@ -22,9 +23,9 @@ func InitNotificationService() {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
-	svc := sqs.New(sess)
+	svc := sns.New(sess)
 	notification = &Notification{
-		sqs: svc,
+		sns: svc,
 	}
 }
 
@@ -36,12 +37,17 @@ func GetNotificationObj() *Notification {
 }
 func (notify *Notification) SendUrlNotificationToScrapper(search *searchcondition.SearchCondition, hostname constants.HostName, joblinks []string) {
 	for _, url := range joblinks {
-		bytes, err := json.Marshal(map[string]any{"searchCondition": search, "hostName": hostname, "jobUrl": url})
+		bytes, _ := json.Marshal(map[string]any{"searchCondition": search, "hostName": hostname, "jobUrl": url})
 		env := config.GetConfig()
-		_, err = notify.sqs.SendMessage(&sqs.SendMessageInput{
-			DelaySeconds: aws.Int64(10),
-			MessageBody:  aws.String(string(bytes)),
-			QueueUrl:     aws.String(env.GetScrapperQueueUrl()),
+		_, err := notify.sns.Publish(&sns.PublishInput{
+			Message: aws.String(string(bytes)),
+			MessageAttributes: map[string]*sns.MessageAttributeValue{
+				"hostName": {
+					DataType:    aws.String("String"),
+					StringValue: aws.String(string(hostname)),
+				},
+			},
+			TopicArn: jsii.String(env.GetScrapperSnsTopicArn()),
 		})
 		if err != nil {
 			log.Printf("error while sending notification, %+v", err)

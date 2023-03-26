@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/main.go",
       "args": [], 
       "env": {
-        "ScrapperQueueUrl":"https://sqs.ap-southeast-1.amazonaws.com/638580160310/TestSQS"
+        "ScrapperSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:scrapper-sns-topic"
       },
       "showLog": true
     }
