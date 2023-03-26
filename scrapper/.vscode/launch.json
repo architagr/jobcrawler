@@ -7,9 +7,14 @@
         {
             "name": "Launch scrapper",
             "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "main.go"
+            "request": "launch", 
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "args": [], 
+            "env": {
+                "ScrapperSqsUrl":"https://sqs.ap-southeast-1.amazonaws.com/638580160310/linkedin-scrapper-queue"
+            },
+            "showLog": true
         }
     ]
 }

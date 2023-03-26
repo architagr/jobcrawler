@@ -1,6 +1,7 @@
 package main
 
 import (
+	scrapperlambda "infra/scrapper_lambda"
 	"infra/scrappersns"
 	"infra/scrappersqs"
 
@@ -25,6 +26,13 @@ func main() {
 		},
 	})
 	scrappersns.NewScrapperSnsStack(app, "ScrapperTopic", &scrappersns.ScrapperSnsStackProps{
+		StackProps: awscdk.StackProps{
+			Env: env(),
+		},
+		Queues: queues,
+	})
+
+	scrapperlambda.NewScrapperSnsStack(app, "ScrapperLambda", &scrapperlambda.ScrapperLambdaStackProps{
 		StackProps: awscdk.StackProps{
 			Env: env(),
 		},

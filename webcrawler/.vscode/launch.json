@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-      "name": "Launch",
-      "type": "go",
-      "request": "launch", 
-      "mode": "debug",
-      "program": "${workspaceFolder}/main.go",
-      "args": [], 
-      "env": {
-        "ScrapperSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:scrapper-sns-topic"
-      },
-      "showLog": true
+          "name": "Launch crawler",
+          "type": "go",
+          "request": "launch", 
+          "mode": "debug",
+          "program": "${workspaceFolder}/main.go",
+          "args": [], 
+          "env": {
+            "ScrapperSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:scrapper-sns-topic"
+          },
+          "showLog": true
     }
     ]
 }
