@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"jobcrawler/config"
 	"jobcrawler/notification"
 	"jobcrawler/urlfrontier"
 	"jobcrawler/urlseeding"
@@ -13,12 +15,34 @@ import (
 	"github.com/architagr/repository/connection"
 )
 
+var env *config.Config
+
 func main() {
-	//setupDB()
+	config.InitConfig()
+	env = config.GetConfig()
+	fmt.Println(env.GetScrapperSnsTopicArn())
+	// setupDB()
 	crawlLinkedIn()
+	//testSns()
+}
+func testSns() {
+	notification := notification.GetNotificationObj()
+	search := &searchcondition.SearchCondition{
+		JobTitle: constants.JobTitle_SoftwareEngineer,
+		LocationInfo: searchcondition.Location{
+			Country: "United States",
+			City:    "New York",
+		},
+		RoleName:   constants.Role_Engineering,
+		JobType:    constants.JobType_FullTime,
+		JobModel:   constants.JobModel_OnSite,
+		Experience: constants.ExperienceLevel_EntryLevel,
+	}
+	notification.SendUrlNotificationToScrapper(search, constants.HostName_Linkedin, []string{"test linkedin1", "test linkedin2", "test linkedin3"})
+	notification.SendUrlNotificationToScrapper(search, constants.HostName_Indeed, []string{"test indeed1", "test indeed2", "test indeed3"})
 }
 func crawlLinkedIn() {
-	notification := new(notification.Notification)
+	notification := notification.GetNotificationObj()
 	search := &searchcondition.SearchCondition{
 		JobTitle: constants.JobTitle_SoftwareEngineer,
 		LocationInfo: searchcondition.Location{

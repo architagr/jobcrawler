@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/architagr/common-constants/constants"
+	jobdetails "github.com/architagr/common-models/job-details"
 	searchcondition "github.com/architagr/common-models/search-condition"
 
 	"github.com/gocolly/colly/v2"
@@ -17,14 +18,14 @@ type LinkedinExtractor struct {
 	collector    *colly.Collector
 	queue        *queue.Queue
 	search       searchcondition.SearchCondition
-	jobDetails   models.JobDetails
+	jobDetails   jobdetails.JobDetails
 	logger       *log.Logger
 	errorDetails error
 	retryCount   int
 	notification *notification.Notification
 }
 
-func InitLinkedInExtractor(search searchcondition.SearchCondition, notification *notification.Notification) IExtractor {
+func initLinkedInExtractor(search searchcondition.SearchCondition, notification *notification.Notification) IExtractor {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
 		constants.UserAgent,
@@ -40,7 +41,7 @@ func InitLinkedInExtractor(search searchcondition.SearchCondition, notification 
 		collector:    c,
 		queue:        q,
 		search:       search,
-		jobDetails:   models.JobDetails{},
+		jobDetails:   jobdetails.JobDetails{},
 		logger:       logger,
 		retryCount:   5,
 		errorDetails: nil,
@@ -66,15 +67,15 @@ func getQueue() (*queue.Queue, error) {
 		&queue.InMemoryQueueStorage{MaxSize: 10000}, // Use default queue storage
 	)
 }
-func (extractor *LinkedinExtractor) StartExtraction(links models.Link) (models.JobDetails, error) {
-	extractor.jobDetails = models.JobDetails{}
+func (extractor *LinkedinExtractor) StartExtraction(links models.Link) error {
+	extractor.jobDetails = jobdetails.JobDetails{}
 
 	queue, _ := getQueue()
 	queue.AddURL(links.Url)
 	queue.Run(extractor.collector)
 
-	extractor.notification.SendUrlNotification(&extractor.search, constants.HostName_Linkedin, extractor.jobDetails)
-	return extractor.jobDetails, extractor.errorDetails
+	extractor.notification.SendNotificationToDatabase(&extractor.search, constants.HostName_Linkedin, extractor.jobDetails)
+	return extractor.errorDetails
 }
 func sanatizeString(nStr string) string {
 	nStr = strings.ReplaceAll(nStr, "\r", "")

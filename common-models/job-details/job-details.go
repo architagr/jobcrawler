@@ -1,4 +1,4 @@
-package models
+package jobdetails
 
 import "github.com/architagr/common-constants/constants"
 
