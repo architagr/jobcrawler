@@ -7,6 +7,7 @@ import (
 
 	"github.com/architagr/common-constants/constants"
 	searchcondition "github.com/architagr/common-models/search-condition"
+	notificationModel "github.com/architagr/common-models/sns-notification"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
@@ -37,7 +38,11 @@ func GetNotificationObj() *Notification {
 }
 func (notify *Notification) SendUrlNotificationToScrapper(search *searchcondition.SearchCondition, hostname constants.HostName, joblinks []string) {
 	for _, url := range joblinks {
-		bytes, _ := json.Marshal(map[string]any{"searchCondition": search, "hostName": hostname, "jobUrl": url})
+		bytes, _ := json.Marshal(notificationModel.Notification[string]{
+			SearchCondition: *search,
+			HostName:        hostname,
+			Data:            url,
+		})
 		env := config.GetConfig()
 		_, err := notify.sns.Publish(&sns.PublishInput{
 			Message: aws.String(string(bytes)),

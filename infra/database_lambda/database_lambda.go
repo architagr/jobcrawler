@@ -1,11 +1,9 @@
-package scrapperlambda
+package databaselambda
 
 import (
 	"fmt"
 
 	"github.com/architagr/common-constants/constants"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awssns"
-
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 
@@ -16,13 +14,12 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type ScrapperLambdaStackProps struct {
+type DatabaseLambdaStackProps struct {
 	awscdk.StackProps
-	Queues           map[constants.HostName]awssqs.Queue
-	DatabaseSNSTopic *awssns.Topic
+	Queues map[constants.HostName]awssqs.Queue
 }
 
-func NewScrapperLambdaStack(scope constructs.Construct, id string, props *ScrapperLambdaStackProps) awscdk.Stack {
+func NewDatabaseLambdaStack(scope constructs.Construct, id string, props *DatabaseLambdaStackProps) awscdk.Stack {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -31,22 +28,20 @@ func NewScrapperLambdaStack(scope constructs.Construct, id string, props *Scrapp
 
 	for hostName, scrapperQueue := range props.Queues {
 		env := make(map[string]*string)
-		env["ScrapperSqsUrl"] = scrapperQueue.QueueUrl()
-		env["DatabaseSNSTopicArn"] = (*props.DatabaseSNSTopic).TopicArn()
+		env["DatabaseSqsUrl"] = scrapperQueue.QueueUrl()
+		env["DbConnectionString"] = jsii.String("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority")
 
-		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sScrapperLambda", hostName)), &awslambda.FunctionProps{
+		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sDatabaseLambda", hostName)), &awslambda.FunctionProps{
 			Environment:  &env,
 			Runtime:      awslambda.Runtime_GO_1_X(),
-			Handler:      jsii.String("scrapper"),
-			Code:         awslambda.Code_FromAsset(jsii.String("./../scrapper/main.zip"), &awss3assets.AssetOptions{}),
-			FunctionName: jsii.String(fmt.Sprintf("%s-scrapper-lambda-fn", hostName)),
+			Handler:      jsii.String("database-lambda"),
+			Code:         awslambda.Code_FromAsset(jsii.String("./../database-lambda/main.zip"), &awss3assets.AssetOptions{}),
+			FunctionName: jsii.String(fmt.Sprintf("%s-database-lambda-fn", hostName)),
 		})
 		scrapperQueue.GrantConsumeMessages(lambdaFunction)
-		(*props.DatabaseSNSTopic).GrantPublish(lambdaFunction)
-
 		triggerEvent := lambdaEvent.NewSqsEventSource(scrapperQueue, &lambdaEvent.SqsEventSourceProps{
-			BatchSize:         jsii.Number(1),
-			MaxBatchingWindow: awscdk.Duration_Millis(jsii.Number(0)),
+			BatchSize:         jsii.Number(10),
+			MaxBatchingWindow: awscdk.Duration_Seconds(jsii.Number(1)),
 			MaxConcurrency:    jsii.Number(5),
 			Enabled:           jsii.Bool(true),
 		})

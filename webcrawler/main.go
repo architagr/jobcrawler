@@ -22,8 +22,8 @@ func main() {
 	env = config.GetConfig()
 	fmt.Println(env.GetScrapperSnsTopicArn())
 	// setupDB()
-	//crawlLinkedIn()
-	testSns()
+	crawlLinkedIn()
+	//testSns()
 }
 func testSns() {
 	notification := notification.GetNotificationObj()

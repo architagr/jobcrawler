@@ -1,7 +1,11 @@
 package main
 
 import (
+	databaselambda "infra/database_lambda"
+	"infra/databasesns"
+	"infra/databasesqs"
 	scrapperlambda "infra/scrapper_lambda"
+
 	"infra/scrappersns"
 	"infra/scrappersqs"
 
@@ -15,29 +19,54 @@ func main() {
 	defer jsii.Close()
 
 	app := awscdk.NewApp(nil)
-
-	_, queues := scrappersqs.NewScrapperSqsStack(app, "ScrapperQueues", &scrappersqs.ScrapperSqsStackProps{
-		StackProps: awscdk.StackProps{
-			Env: env(),
+	stackProps := awscdk.StackProps{
+		Env: env(),
+		Tags: &map[string]*string{
+			"project": jsii.String("job crawler"),
 		},
+	}
+	//#region create queues
+	_, scrapperQueues := scrappersqs.NewScrapperSqsStack(app, "ScrapperQueues", &scrappersqs.ScrapperSqsStackProps{
+		StackProps: stackProps,
 		HostNames: map[constants.HostName]float64{
 			constants.HostName_Linkedin: float64(1),
 			constants.HostName_Indeed:   float64(1),
 		},
 	})
-	scrappersns.NewScrapperSnsStack(app, "ScrapperTopic", &scrappersns.ScrapperSnsStackProps{
-		StackProps: awscdk.StackProps{
-			Env: env(),
+
+	_, databaseQueues := databasesqs.NewDatabaseSQSStack(app, "DatabaseQueues", &databasesqs.DatabaseSQSStackProps{
+		StackProps: stackProps,
+		HostNames: map[constants.HostName]float64{
+			constants.HostName_Linkedin: float64(1),
+			constants.HostName_Indeed:   float64(1),
 		},
-		Queues: queues,
+	})
+	//#endregion
+
+	//#region create SNS topics
+	scrappersns.NewScrapperSnsStack(app, "ScrapperTopic", &scrappersns.ScrapperSnsStackProps{
+		StackProps: stackProps,
+		Queues:     scrapperQueues,
 	})
 
-	scrapperlambda.NewScrapperSnsStack(app, "ScrapperLambda", &scrapperlambda.ScrapperLambdaStackProps{
-		StackProps: awscdk.StackProps{
-			Env: env(),
-		},
-		Queues: queues,
+	_, databaseTopic := databasesns.NewDatabaseSNSStack(app, "DatabaseTopic", &databasesns.DatabaseSNSStackProps{
+		StackProps: stackProps,
+		Queues:     databaseQueues,
 	})
+	//#endregion
+
+	//#region create lambda
+	scrapperlambda.NewScrapperLambdaStack(app, "ScrapperLambda", &scrapperlambda.ScrapperLambdaStackProps{
+		StackProps:       stackProps,
+		Queues:           scrapperQueues,
+		DatabaseSNSTopic: databaseTopic,
+	})
+
+	databaselambda.NewDatabaseLambdaStack(app, "DatabaseLambda", &databaselambda.DatabaseLambdaStackProps{
+		StackProps: stackProps,
+		Queues:     databaseQueues,
+	})
+	//#endregion
 	app.Synth(nil)
 }
 

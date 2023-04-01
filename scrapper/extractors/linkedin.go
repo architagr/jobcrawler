@@ -24,7 +24,7 @@ type LinkedinExtractor struct {
 	notification *notification.Notification
 }
 
-func InitLinkedInExtractor(search searchcondition.SearchCondition, notification *notification.Notification) IExtractor {
+func initLinkedInExtractor(search searchcondition.SearchCondition, notification *notification.Notification) IExtractor {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
 		constants.UserAgent,
@@ -66,15 +66,15 @@ func getQueue() (*queue.Queue, error) {
 		&queue.InMemoryQueueStorage{MaxSize: 10000}, // Use default queue storage
 	)
 }
-func (extractor *LinkedinExtractor) StartExtraction(links models.Link) (models.JobDetails, error) {
+func (extractor *LinkedinExtractor) StartExtraction(links models.Link) error {
 	extractor.jobDetails = models.JobDetails{}
 
 	queue, _ := getQueue()
 	queue.AddURL(links.Url)
 	queue.Run(extractor.collector)
 
-	extractor.notification.SendUrlNotification(&extractor.search, constants.HostName_Linkedin, extractor.jobDetails)
-	return extractor.jobDetails, extractor.errorDetails
+	extractor.notification.SendNotificationToDatabase(&extractor.search, constants.HostName_Linkedin, extractor.jobDetails)
+	return extractor.errorDetails
 }
 func sanatizeString(nStr string) string {
 	nStr = strings.ReplaceAll(nStr, "\r", "")

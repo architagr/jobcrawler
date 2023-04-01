@@ -1,4 +1,4 @@
-package scrappersqs
+package databasesqs
 
 import (
 	"fmt"
@@ -11,12 +11,12 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type ScrapperSqsStackProps struct {
+type DatabaseSQSStackProps struct {
 	awscdk.StackProps
 	HostNames map[constants.HostName]float64
 }
 
-func NewScrapperSqsStack(scope constructs.Construct, id string, props *ScrapperSqsStackProps) (awscdk.Stack, map[constants.HostName]awssqs.Queue) {
+func NewDatabaseSQSStack(scope constructs.Construct, id string, props *DatabaseSQSStackProps) (awscdk.Stack, map[constants.HostName]awssqs.Queue) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -27,9 +27,9 @@ func NewScrapperSqsStack(scope constructs.Construct, id string, props *ScrapperS
 
 	// TODO: add a deadletter queue
 	for hostName, delay := range props.HostNames {
-		queueId := aws.String(fmt.Sprintf("%sScrapperQueue", hostName))
+		queueId := aws.String(fmt.Sprintf("%sDatabaseQueue", hostName))
 		queues[hostName] = awssqs.NewQueue(stack, queueId, &awssqs.QueueProps{
-			QueueName:           aws.String(fmt.Sprintf("%s-scrapper-queue", hostName)),
+			QueueName:           aws.String(fmt.Sprintf("%s-database-queue", hostName)),
 			RetentionPeriod:     awscdk.Duration_Days(jsii.Number(1)),
 			MaxMessageSizeBytes: jsii.Number(262144),
 			VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(300)),

@@ -3,18 +3,21 @@ package config
 import "os"
 
 type Config struct {
-	scrapperSqsUrl string
+	scrapperSqsUrl      string
+	databaseSNSTopicArn string
 }
 
 var env *Config
 
 const (
-	scrapperSqsUrlKey = "ScrapperSqsUrl"
+	scrapperSqsUrlKey      = "ScrapperSqsUrl"
+	databaseSnsTopicArnKey = "DatabaseSNSTopicArn"
 )
 
 func InitConfig() {
 	env = &Config{
-		scrapperSqsUrl: os.Getenv(scrapperSqsUrlKey),
+		scrapperSqsUrl:      os.Getenv(scrapperSqsUrlKey),
+		databaseSNSTopicArn: os.Getenv(databaseSnsTopicArnKey),
 	}
 }
 
@@ -27,4 +30,8 @@ func GetConfig() *Config {
 
 func (e *Config) GetScrapperSqsUrl() string {
 	return e.scrapperSqsUrl
+}
+
+func (e *Config) GetDatabaseSNSTopicArn() string {
+	return e.databaseSNSTopicArn
 }
