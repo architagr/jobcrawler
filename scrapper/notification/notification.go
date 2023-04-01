@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"scrapper/config"
-	"scrapper/models"
 
 	"github.com/architagr/common-constants/constants"
+	jobdetails "github.com/architagr/common-models/job-details"
 	searchcondition "github.com/architagr/common-models/search-condition"
+
 	notificationModel "github.com/architagr/common-models/sns-notification"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -37,8 +38,8 @@ func GetNotificationObj() *Notification {
 	}
 	return notification
 }
-func (notify *Notification) SendNotificationToDatabase(search *searchcondition.SearchCondition, hostname constants.HostName, jobDetails models.JobDetails) {
-	bytes, _ := json.Marshal(notificationModel.Notification[models.JobDetails]{
+func (notify *Notification) SendNotificationToDatabase(search *searchcondition.SearchCondition, hostname constants.HostName, jobDetails jobdetails.JobDetails) {
+	bytes, _ := json.Marshal(notificationModel.Notification[jobdetails.JobDetails]{
 		SearchCondition: *search,
 		HostName:        hostname,
 		Data:            jobDetails,

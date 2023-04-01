@@ -48,12 +48,3 @@ func main() {
 	notificationObj = notification.GetNotificationObj()
 	lambda.Start(handler)
 }
-
-// func setupDB() {
-// 	conn := connection.InitConnection("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority", 10)
-// 	err := conn.ValidateConnection()
-// 	if err != nil {
-// 		log.Fatalf("error in conncting to mongo %+v", err)
-// 	}
-
-// }

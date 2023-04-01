@@ -31,7 +31,6 @@ func NewScrapperLambdaStack(scope constructs.Construct, id string, props *Scrapp
 
 	for hostName, scrapperQueue := range props.Queues {
 		env := make(map[string]*string)
-		env["ScrapperSqsUrl"] = scrapperQueue.QueueUrl()
 		env["DatabaseSNSTopicArn"] = (*props.DatabaseSNSTopic).TopicArn()
 
 		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sScrapperLambda", hostName)), &awslambda.FunctionProps{

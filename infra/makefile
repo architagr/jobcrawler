@@ -14,3 +14,7 @@ deploy:
 	rm -rf cdk.out
 	clear
 	cdk deploy --all --require-approval never
+	make clear
+
+destroy:
+	cdk destroy --all --require-approval never

@@ -26,10 +26,11 @@ func NewDatabaseLambdaStack(scope constructs.Construct, id string, props *Databa
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	for hostName, scrapperQueue := range props.Queues {
+	for hostName, databaseQueue := range props.Queues {
 		env := make(map[string]*string)
-		env["DatabaseSqsUrl"] = scrapperQueue.QueueUrl()
 		env["DbConnectionString"] = jsii.String("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority")
+		env["DatabaseName"] = jsii.String("webscrapper")
+		env["CollectionName"] = jsii.String("jobDetails")
 
 		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sDatabaseLambda", hostName)), &awslambda.FunctionProps{
 			Environment:  &env,
@@ -38,8 +39,8 @@ func NewDatabaseLambdaStack(scope constructs.Construct, id string, props *Databa
 			Code:         awslambda.Code_FromAsset(jsii.String("./../database-lambda/main.zip"), &awss3assets.AssetOptions{}),
 			FunctionName: jsii.String(fmt.Sprintf("%s-database-lambda-fn", hostName)),
 		})
-		scrapperQueue.GrantConsumeMessages(lambdaFunction)
-		triggerEvent := lambdaEvent.NewSqsEventSource(scrapperQueue, &lambdaEvent.SqsEventSourceProps{
+		databaseQueue.GrantConsumeMessages(lambdaFunction)
+		triggerEvent := lambdaEvent.NewSqsEventSource(databaseQueue, &lambdaEvent.SqsEventSourceProps{
 			BatchSize:         jsii.Number(10),
 			MaxBatchingWindow: awscdk.Duration_Seconds(jsii.Number(1)),
 			MaxConcurrency:    jsii.Number(5),
