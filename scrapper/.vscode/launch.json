@@ -12,8 +12,7 @@
             "program": "${workspaceFolder}/main.go",
             "args": [], 
             "env": {
-                "ScrapperSqsUrl":"https://sqs.ap-southeast-1.amazonaws.com/638580160310/linkedin-scrapper-queue",
-                "DbConnectionString": "mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority"
+                "DatabaseSNSTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:database-sns-topic",
             },
             "showLog": true
         }

@@ -9,8 +9,8 @@ import (
 
 	jobdetails "github.com/architagr/common-models/job-details"
 	notificationModel "github.com/architagr/common-models/sns-notification"
+	"github.com/architagr/repository/collection"
 	"github.com/architagr/repository/connection"
-	"github.com/architagr/repository/document"
 
 	sqs_message "github.com/architagr/common-models/sqs-message"
 	"github.com/aws/aws-lambda-go/events"
@@ -32,7 +32,7 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		fmt.Printf("The message %s for event source %s, messageContent: %+v \n", message.MessageId, message.EventSource, messageContent)
 	}
 
-	doc, err := document.InitDocument[jobdetails.JobDetails](conn, env.GetDatabaseName(), env.GetCollectionName())
+	doc, err := collection.InitCollection[jobdetails.JobDetails](conn, env.GetDatabaseName(), env.GetCollectionName())
 	if err != nil {
 		log.Panic(err)
 	}

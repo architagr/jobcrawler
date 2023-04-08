@@ -1,6 +1,10 @@
 package main
 
 import (
+	"fmt"
+	crawlerlambda "infra/crawler_lambda"
+	"infra/crawlersns"
+	"infra/crawlersqs"
 	databaselambda "infra/database_lambda"
 	"infra/databasesns"
 	"infra/databasesqs"
@@ -19,12 +23,8 @@ func main() {
 	defer jsii.Close()
 
 	app := awscdk.NewApp(nil)
-	stackProps := awscdk.StackProps{
-		Env: env(),
-		Tags: &map[string]*string{
-			"project": jsii.String("job crawler"),
-		},
-	}
+
+	stackProps := env(app)
 	//#region create queues
 	_, scrapperQueues := scrappersqs.NewScrapperSqsStack(app, "ScrapperQueues", &scrappersqs.ScrapperSqsStackProps{
 		StackProps: stackProps,
@@ -41,10 +41,18 @@ func main() {
 			constants.HostName_Indeed:   float64(1),
 		},
 	})
+
+	_, crawlerQueues := crawlersqs.NewCrawlerSQSStack(app, "CrawlerQueues", &crawlersqs.CrawlerSQSStackProps{
+		StackProps: stackProps,
+		HostNames: map[constants.HostName]float64{
+			constants.HostName_Linkedin: float64(1),
+			constants.HostName_Indeed:   float64(1),
+		},
+	})
 	//#endregion
 
 	//#region create SNS topics
-	scrappersns.NewScrapperSnsStack(app, "ScrapperTopic", &scrappersns.ScrapperSnsStackProps{
+	_, scrapperTopic := scrappersns.NewScrapperSnsStack(app, "ScrapperTopic", &scrappersns.ScrapperSnsStackProps{
 		StackProps: stackProps,
 		Queues:     scrapperQueues,
 	})
@@ -52,6 +60,11 @@ func main() {
 	_, databaseTopic := databasesns.NewDatabaseSNSStack(app, "DatabaseTopic", &databasesns.DatabaseSNSStackProps{
 		StackProps: stackProps,
 		Queues:     databaseQueues,
+	})
+
+	crawlersns.NewCrawlerSNSStack(app, "CrawlerTopic", &crawlersns.CrawlerSNSStackProps{
+		StackProps:    stackProps,
+		CrawlerQueues: crawlerQueues,
 	})
 	//#endregion
 
@@ -66,13 +79,22 @@ func main() {
 		StackProps: stackProps,
 		Queues:     databaseQueues,
 	})
+
+	crawlerlambda.NewCrawlerLambdaStack(app, "CrawlerLambda", &crawlerlambda.CrawlerLambdaStackProps{
+		StackProps:       stackProps,
+		ScrapperSNSTopic: scrapperTopic,
+		CrawlerQueues:    crawlerQueues,
+	})
 	//#endregion
 	app.Synth(nil)
 }
 
 // env determines the AWS environment (account+region) in which our stack is to
 // be deployed. For more information see: https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-func env() *awscdk.Environment {
+func env(app awscdk.App) awscdk.StackProps {
+	accountId := fmt.Sprint(app.Node().TryGetContext(jsii.String("ACCOUNT_ID")))
+	region := fmt.Sprint(app.Node().TryGetContext(jsii.String("REGION")))
+	project := fmt.Sprint(app.Node().TryGetContext(jsii.String("PROJECT")))
 	// If unspecified, this stack will be "environment-agnostic".
 	// Account/Region-dependent features and context lookups will not work, but a
 	// single synthesized template can be deployed anywhere.
@@ -82,9 +104,14 @@ func env() *awscdk.Environment {
 	// Uncomment if you know exactly what account and region you want to deploy
 	// the stack to. This is the recommendation for production stacks.
 	//---------------------------------------------------------------------------
-	return &awscdk.Environment{
-		Account: jsii.String("638580160310"),
-		Region:  jsii.String("ap-southeast-1"),
+	return awscdk.StackProps{
+		Env: &awscdk.Environment{
+			Account: jsii.String(accountId),
+			Region:  jsii.String(region),
+		},
+		Tags: &map[string]*string{
+			"project": jsii.String(project),
+		},
 	}
 
 	// Uncomment to specialize this stack for the AWS Account and Region that are
