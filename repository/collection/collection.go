@@ -1,45 +1,47 @@
-package document
+package collection
 
 import (
 	"context"
 	"reflect"
 
 	"github.com/architagr/repository/connection"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type IDocument[T any] interface {
+type ICollection[T any] interface {
 	Disconnect()
 	AddSingle(data T) (id interface{}, err error)
 	AddMany(data []T) (ids []interface{}, err error)
 	GetById(id interface{}) (data T, err error)
-	Get(filter interface{}) (data []T, err error)
+	Get(filter interface{}, pageSize int64, startPage int64) (data []T, err error)
 }
 
-type Document[T any] struct {
+type Collection[T any] struct {
 	ctx         context.Context
 	mongoClient *mongo.Client
 	collection  *mongo.Collection
 }
 
-func InitDocument[T any](conn connection.IConnection, databaseName, collection string) (IDocument[T], error) {
+func InitCollection[T any](conn connection.IConnection, databaseName, collection string) (ICollection[T], error) {
 	client, ctx, err := conn.GetConnction()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Document[T]{
+	return &Collection[T]{
 		ctx:         ctx,
 		mongoClient: client,
 		collection:  client.Database(databaseName).Collection(collection),
 	}, nil
 }
 
-func (doc *Document[T]) Disconnect() {
+func (doc *Collection[T]) Disconnect() {
 	doc.mongoClient.Disconnect(doc.ctx)
 }
 
-func (doc *Document[T]) AddSingle(data T) (id interface{}, err error) {
+func (doc *Collection[T]) AddSingle(data T) (id interface{}, err error) {
 
 	result, err := doc.collection.InsertOne(context.TODO(), data)
 	if err != nil {
@@ -49,7 +51,7 @@ func (doc *Document[T]) AddSingle(data T) (id interface{}, err error) {
 	return
 }
 
-func (doc *Document[T]) AddMany(data []T) (ids []interface{}, err error) {
+func (doc *Collection[T]) AddMany(data []T) (ids []interface{}, err error) {
 	docs := make([]interface{}, len(data))
 	for i, d := range data {
 		docs[i] = d
@@ -62,7 +64,7 @@ func (doc *Document[T]) AddMany(data []T) (ids []interface{}, err error) {
 	return
 }
 
-func (doc *Document[T]) GetById(id interface{}) (data T, err error) {
+func (doc *Collection[T]) GetById(id interface{}) (data T, err error) {
 	filter := make(map[string]interface{})
 	filter["_id"] = id
 	result := doc.collection.FindOne(context.TODO(), filter)
@@ -79,8 +81,21 @@ func (doc *Document[T]) GetById(id interface{}) (data T, err error) {
 	return
 }
 
-func (doc *Document[T]) Get(filter interface{}) (data []T, err error) {
-	result, err := doc.collection.Find(context.TODO(), filter)
+func (doc *Collection[T]) Get(filter interface{}, pageSize int64, startPage int64) (data []T, err error) {
+	if pageSize == 0 {
+		pageSize = 10
+	}
+	skip := startPage * pageSize
+	if skip > 0 {
+		skip--
+	}
+	if filter == nil {
+		filter = bson.D{{}}
+	}
+	filterOptions := options.Find()
+	filterOptions.Limit = &pageSize
+	filterOptions.Skip = &skip
+	result, err := doc.collection.Find(context.TODO(), filter, filterOptions)
 	if err != nil {
 		return
 	}
@@ -92,7 +107,7 @@ func (doc *Document[T]) Get(filter interface{}) (data []T, err error) {
 	return
 }
 
-func (doc *Document[T]) interfaceSlice(slice interface{}) []T {
+func (doc *Collection[T]) interfaceSlice(slice interface{}) []T {
 	s := reflect.ValueOf(slice)
 	if s.Kind() != reflect.Slice {
 		panic("InterfaceSlice() given a non-slice type")

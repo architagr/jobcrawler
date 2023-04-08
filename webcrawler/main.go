@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"jobcrawler/config"
 	"jobcrawler/notification"
@@ -8,77 +10,46 @@ import (
 	"jobcrawler/urlseeding"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/architagr/common-constants/constants"
-	searchcondition "github.com/architagr/common-models/search-condition"
-	"github.com/architagr/repository/connection"
+
+	notificationModel "github.com/architagr/common-models/sns-notification"
+
+	sqs_message "github.com/architagr/common-models/sqs-message"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
-var env *config.Config
-
 func main() {
+	log.Printf("lambda start")
 	config.InitConfig()
-	env = config.GetConfig()
-	fmt.Println(env.GetScrapperSnsTopicArn())
-	// setupDB()
-	crawlLinkedIn()
-	//testSns()
+	lambda.Start(handler)
 }
-func testSns() {
-	notification := notification.GetNotificationObj()
-	search := &searchcondition.SearchCondition{
-		JobTitle: constants.JobTitle_SoftwareEngineer,
-		LocationInfo: searchcondition.Location{
-			Country: "United States",
-			City:    "New York",
-		},
-		RoleName:   constants.Role_Engineering,
-		JobType:    constants.JobType_FullTime,
-		JobModel:   constants.JobModel_OnSite,
-		Experience: constants.ExperienceLevel_EntryLevel,
-	}
-	notification.SendUrlNotificationToScrapper(search, constants.HostName_Linkedin, []string{"test linkedin1", "test linkedin2", "test linkedin3"})
-	notification.SendUrlNotificationToScrapper(search, constants.HostName_Indeed, []string{"test indeed1", "test indeed2", "test indeed3"})
-}
-func crawlLinkedIn() {
-	notification := notification.GetNotificationObj()
-	search := &searchcondition.SearchCondition{
-		JobTitle: constants.JobTitle_SoftwareEngineer,
-		LocationInfo: searchcondition.Location{
-			Country: "United States",
-			City:    "New York",
-		},
-		RoleName:   constants.Role_Engineering,
-		JobType:    constants.JobType_FullTime,
-		JobModel:   constants.JobModel_OnSite,
-		Experience: constants.ExperienceLevel_EntryLevel,
-	}
-	start := time.Now()
-
+func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
+	notify := notification.GetNotificationObj()
+	log.Printf("lambda handler start")
 	wg := sync.WaitGroup{}
-	urlSeeding := urlseeding.InitUrlSeeding()
-	linksToCrawl := urlSeeding.GetLinks(search)
-	frontier := urlfrontier.InitUrlFrontier(search, linksToCrawl, notification)
-	log.Println("*******")
-	frontier.Start(&wg)
+	for _, message := range sqsEvent.Records {
+		data := new(sqs_message.MessageBody)
+		json.Unmarshal([]byte(message.Body), data)
+		messageContent := new(notificationModel.Notification[string])
+		json.Unmarshal([]byte(data.Message), messageContent)
+		fmt.Printf("The message %s for event source %s, mesageContent: %+v \n", message.MessageId, message.EventSource, messageContent)
+		frontier := urlfrontier.InitUrlFrontier(&messageContent.SearchCondition, map[constants.HostName]urlseeding.CrawlerLinks{
+			messageContent.HostName: {
+				DelayInMilliseconds: 1000,
+				Parallisim:          1,
+				Links: []urlseeding.Link{
+					{
+						Url:        messageContent.Data,
+						RetryCount: 5,
+					},
+				},
+			},
+		}, notify)
 
-	log.Println("*******")
-	end := time.Now()
-	log.Println(end.Sub(start))
-}
-
-func setupDB() {
-	conn := connection.InitConnection("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority", 10)
-	err := conn.ValidateConnection()
-	if err != nil {
-		log.Fatalf("error in conncting to mongo %+v", err)
+		frontier.Start(&wg)
 	}
 
-	client, ctx, err := conn.GetConnction()
-	if err != nil {
-		log.Fatalf("error in conncting to mongo %+v", err)
-	}
-
-	defer client.Disconnect(ctx)
+	return nil
 }

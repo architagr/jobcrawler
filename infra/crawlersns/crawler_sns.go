@@ -1,4 +1,4 @@
-package scrappersns
+package crawlersns
 
 import (
 	"github.com/architagr/common-constants/constants"
@@ -11,27 +11,26 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type ScrapperSnsStackProps struct {
+type CrawlerSNSStackProps struct {
 	awscdk.StackProps
-	Queues map[constants.HostName]awssqs.Queue
+	CrawlerQueues map[constants.HostName]awssqs.Queue
 }
 
-func NewScrapperSnsStack(scope constructs.Construct, id string, props *ScrapperSnsStackProps) (awscdk.Stack, *awssns.Topic) {
+func NewCrawlerSNSStack(scope constructs.Construct, id string, props *CrawlerSNSStackProps) (awscdk.Stack, *awssns.Topic) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
-	topic := awssns.NewTopic(stack, aws.String("ScrapperSns"), &awssns.TopicProps{
-		DisplayName: aws.String("Scrapper SNS Topic"),
-		TopicName:   aws.String("scrapper-sns-topic"),
+	topic := awssns.NewTopic(stack, aws.String("CrawlerSns"), &awssns.TopicProps{
+		DisplayName: aws.String("Crawler SNS Topic"),
+		TopicName:   aws.String("crawler-sns-topic"),
 	})
-
-	for hostName, scrapperQueue := range props.Queues {
+	for hostName, orchestrationQueue := range props.CrawlerQueues {
 		filter := map[string]awssns.SubscriptionFilter{
 			"hostName": awssns.SubscriptionFilter_StringFilter(&awssns.StringConditions{Allowlist: jsii.Strings(string(hostName))}),
 		}
-		topic.AddSubscription(awssnssubscriptions.NewSqsSubscription(scrapperQueue, &awssnssubscriptions.SqsSubscriptionProps{
+		topic.AddSubscription(awssnssubscriptions.NewSqsSubscription(orchestrationQueue, &awssnssubscriptions.SqsSubscriptionProps{
 			FilterPolicy: &filter,
 		}))
 	}

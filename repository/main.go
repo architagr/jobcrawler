@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/architagr/repository/collection"
 	"github.com/architagr/repository/connection"
-	"github.com/architagr/repository/document"
 )
 
 type Jobs struct {
@@ -15,14 +15,14 @@ type Jobs struct {
 }
 
 func main() {
-	connection := connection.InitConnection("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority", 10)
-	err := connection.ValidateConnection()
+	conn := connection.InitConnection("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority", 10)
+	err := conn.ValidateConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("connection validated")
 
-	doc, err := document.InitDocument[Jobs](connection, "webscrapper", "jobs")
+	doc, err := collection.InitCollection[Jobs](conn, "webscrapper", "jobs")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func main() {
 
 	filter := map[string]interface{}{"title": "Workplace Services Manager, Google"}
 
-	result, err := doc.Get(filter)
+	result, err := doc.Get(filter, 10, 0)
 	if err != nil {
 		log.Fatal(err)
 	}
