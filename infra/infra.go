@@ -8,6 +8,7 @@ import (
 	databaselambda "infra/database_lambda"
 	"infra/databasesns"
 	"infra/databasesqs"
+	orchestrationlambda "infra/orchestration_lambda"
 	scrapperlambda "infra/scrapper_lambda"
 
 	"infra/scrappersns"
@@ -62,7 +63,7 @@ func main() {
 		Queues:     databaseQueues,
 	})
 
-	crawlersns.NewCrawlerSNSStack(app, "CrawlerTopic", &crawlersns.CrawlerSNSStackProps{
+	_, crawlerTopic := crawlersns.NewCrawlerSNSStack(app, "CrawlerTopic", &crawlersns.CrawlerSNSStackProps{
 		StackProps:    stackProps,
 		CrawlerQueues: crawlerQueues,
 	})
@@ -84,6 +85,11 @@ func main() {
 		StackProps:       stackProps,
 		ScrapperSNSTopic: scrapperTopic,
 		CrawlerQueues:    crawlerQueues,
+	})
+
+	orchestrationlambda.NewOrchestrationLambdaStack(app, "OrchestrationLambda", &orchestrationlambda.OrchestrationLambdaStackProps{
+		StackProps:      stackProps,
+		CrawlerSNSTopic: crawlerTopic,
 	})
 	//#endregion
 	app.Synth(nil)
