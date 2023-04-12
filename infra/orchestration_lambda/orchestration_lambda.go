@@ -42,7 +42,7 @@ func NewOrchestrationLambdaStack(scope constructs.Construct, id string, props *O
 	(*props.CrawlerSNSTopic).GrantPublish(lambdaFunction)
 
 	eventRule := awsevents.NewRule(stack, aws.String("TriggerOrchestrationLambdaEvent"), &awsevents.RuleProps{
-		Schedule: awsevents.Schedule_Cron(&awsevents.CronOptions{Hour: aws.String("0")}),
+		Schedule: awsevents.Schedule_Cron(&awsevents.CronOptions{Hour: aws.String("0"), Minute: aws.String("0")}),
 	})
 	eventRule.AddTarget(awseventstargets.NewLambdaFunction(lambdaFunction, nil))
 
