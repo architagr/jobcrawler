@@ -6,6 +6,7 @@ require (
 	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
 	github.com/architagr/common-models v0.0.0-00010101000000-000000000000
 	github.com/architagr/repository v0.0.0-00010101000000-000000000000
+	github.com/aws/aws-lambda-go v1.39.1
 	github.com/aws/aws-sdk-go v1.44.229
 	github.com/aws/jsii-runtime-go v1.80.0
 )

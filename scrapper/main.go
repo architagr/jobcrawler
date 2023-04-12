@@ -29,13 +29,16 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		fmt.Printf("The message %s for event source %s, mesageContent: %+v \n", message.MessageId, message.EventSource, messageContent)
 		extractor := extractor.InitExtractor(messageContent.HostName, messageContent.SearchCondition, notificationObj)
 		if extractor == nil {
-			log.Panicf("invalid hostname %s", messageContent.HostName)
+			log.Printf("invalid hostname %s\n", messageContent.HostName)
+			return fmt.Errorf("invalid hostname %s\n", messageContent.HostName)
 		}
 		err := extractor.StartExtraction(models.Link{
 			Url: messageContent.Data,
 		})
 		if err != nil {
-			log.Panic(err)
+			log.Printf("error: %+v", err)
+			return err
+
 		}
 	}
 
