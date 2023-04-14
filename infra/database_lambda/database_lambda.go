@@ -16,7 +16,8 @@ import (
 
 type DatabaseLambdaStackProps struct {
 	awscdk.StackProps
-	Queues map[constants.HostName]awssqs.Queue
+	Queues          map[constants.HostName]awssqs.IQueue
+	DeadLetterQueue awssqs.IQueue
 }
 
 func NewDatabaseLambdaStack(scope constructs.Construct, id string, props *DatabaseLambdaStackProps) awscdk.Stack {
@@ -38,8 +39,11 @@ func NewDatabaseLambdaStack(scope constructs.Construct, id string, props *Databa
 			Handler:      jsii.String("database-lambda"),
 			Code:         awslambda.Code_FromAsset(jsii.String("./../database-lambda/main.zip"), &awss3assets.AssetOptions{}),
 			FunctionName: jsii.String(fmt.Sprintf("%s-database-lambda-fn", hostName)),
+			Timeout:      awscdk.Duration_Seconds(jsii.Number(5)),
 		})
 		databaseQueue.GrantConsumeMessages(lambdaFunction)
+		props.DeadLetterQueue.GrantSendMessages(lambdaFunction)
+
 		triggerEvent := lambdaEvent.NewSqsEventSource(databaseQueue, &lambdaEvent.SqsEventSourceProps{
 			BatchSize:         jsii.Number(10),
 			MaxBatchingWindow: awscdk.Duration_Seconds(jsii.Number(1)),

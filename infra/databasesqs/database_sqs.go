@@ -16,27 +16,39 @@ type DatabaseSQSStackProps struct {
 	HostNames map[constants.HostName]float64
 }
 
-func NewDatabaseSQSStack(scope constructs.Construct, id string, props *DatabaseSQSStackProps) (awscdk.Stack, map[constants.HostName]awssqs.Queue) {
+func NewDatabaseSQSStack(scope constructs.Construct, id string, props *DatabaseSQSStackProps) (awscdk.Stack, map[constants.HostName]awssqs.IQueue, awssqs.IQueue) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
 	}
 
 	stack := awscdk.NewStack(scope, &id, &sprops)
-	queues := make(map[constants.HostName]awssqs.Queue)
+	queues := make(map[constants.HostName]awssqs.IQueue)
 
-	// TODO: add a deadletter queue
+	deadLetterQueue := createDeadLetterQueue(stack, props)
+
 	for hostName, delay := range props.HostNames {
 		queueId := aws.String(fmt.Sprintf("%sDatabaseQueue", hostName))
 		queues[hostName] = awssqs.NewQueue(stack, queueId, &awssqs.QueueProps{
 			QueueName:           aws.String(fmt.Sprintf("%s-database-queue", hostName)),
 			RetentionPeriod:     awscdk.Duration_Days(jsii.Number(1)),
 			MaxMessageSizeBytes: jsii.Number(262144),
-			VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(300)),
+			VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(10)),
 			DeliveryDelay:       awscdk.Duration_Seconds(jsii.Number(delay)),
 			Encryption:          awssqs.QueueEncryption_UNENCRYPTED,
+			DeadLetterQueue: &awssqs.DeadLetterQueue{
+				MaxReceiveCount: aws.Float64(5),
+				Queue:           deadLetterQueue,
+			},
 		})
 	}
 
-	return stack, queues
+	return stack, queues, deadLetterQueue
+}
+
+func createDeadLetterQueue(stack awscdk.Stack, props *DatabaseSQSStackProps) awssqs.IQueue {
+	return awssqs.NewQueue(stack, aws.String("DatabaseDeadLetterQueue"), &awssqs.QueueProps{
+		QueueName:  aws.String("database-dead-letter-queue"),
+		Encryption: awssqs.QueueEncryption_UNENCRYPTED,
+	})
 }

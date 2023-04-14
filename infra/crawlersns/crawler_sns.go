@@ -13,7 +13,7 @@ import (
 
 type CrawlerSNSStackProps struct {
 	awscdk.StackProps
-	CrawlerQueues map[constants.HostName]awssqs.Queue
+	CrawlerQueues map[constants.HostName]awssqs.IQueue
 }
 
 func NewCrawlerSNSStack(scope constructs.Construct, id string, props *CrawlerSNSStackProps) (awscdk.Stack, *awssns.Topic) {

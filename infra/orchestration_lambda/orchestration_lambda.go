@@ -38,6 +38,7 @@ func NewOrchestrationLambdaStack(scope constructs.Construct, id string, props *O
 		Handler:      jsii.String("orchestration"),
 		Code:         awslambda.Code_FromAsset(jsii.String("./../orchestration-lambda/main.zip"), &awss3assets.AssetOptions{}),
 		FunctionName: jsii.String("orchestration-lambda-fn"),
+		Timeout:      awscdk.Duration_Seconds(jsii.Number(300)),
 	})
 	(*props.CrawlerSNSTopic).GrantPublish(lambdaFunction)
 

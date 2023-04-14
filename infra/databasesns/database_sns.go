@@ -13,7 +13,7 @@ import (
 
 type DatabaseSNSStackProps struct {
 	awscdk.StackProps
-	Queues map[constants.HostName]awssqs.Queue
+	Queues map[constants.HostName]awssqs.IQueue
 }
 
 func NewDatabaseSNSStack(scope constructs.Construct, id string, props *DatabaseSNSStackProps) (awscdk.Stack, *awssns.Topic) {

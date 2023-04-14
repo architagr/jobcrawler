@@ -13,7 +13,7 @@ import (
 
 type ScrapperSnsStackProps struct {
 	awscdk.StackProps
-	Queues map[constants.HostName]awssqs.Queue
+	Queues map[constants.HostName]awssqs.IQueue
 }
 
 func NewScrapperSnsStack(scope constructs.Construct, id string, props *ScrapperSnsStackProps) (awscdk.Stack, *awssns.Topic) {
