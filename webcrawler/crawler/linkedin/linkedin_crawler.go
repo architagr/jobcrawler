@@ -3,7 +3,6 @@ package linkedin
 import (
 	"jobcrawler/crawler"
 	"jobcrawler/notification"
-	"jobcrawler/urlseeding"
 	"log"
 	"strings"
 
@@ -60,28 +59,15 @@ func getQueue() (*queue.Queue, error) {
 		&queue.InMemoryQueueStorage{MaxSize: 10000}, // Use default queue storage
 	)
 }
-func (crawler *LinkedinCrawler) StartCrawler(links []urlseeding.Link) []string {
+func (crawler *LinkedinCrawler) StartCrawler(link string) []string {
 	crawler.errorLinks = []string{}
 	crawler.jobLinks = []string{}
 
 	queue, _ := getQueue()
-	for _, listingLink := range links {
-		queue.AddURL(listingLink.Url)
-		// crawler.collector.Visit(listingLink)
-	}
+	queue.AddURL(link)
 	queue.Run(crawler.collector)
-	// crawler.collector.Wait()
-	// for crawler.retryCount > 0 && len(crawler.errorLinks) > 0 {
-	// 	time.Sleep(10 * time.Second)
-	// 	links := make([]string, 0)
-	// 	links = append(links, crawler.errorLinks...)
-	// 	crawler.errorLinks = []string{}
-	// 	crawler.retryCount--
-	// 	for _, listingLink := range links {
-	// 		crawler.collector.Visit(listingLink)
-	// 	}
-	// 	crawler.collector.Wait()
-	// }
+
+	log.Printf("jobLinks %+v", crawler.jobLinks)
 	crawler.notification.SendUrlNotificationToScrapper(&crawler.search, constants.HostName_Linkedin, crawler.jobLinks)
 	return crawler.errorLinks
 
@@ -101,7 +87,7 @@ func (crawler *LinkedinCrawler) onResponse(r *colly.Response) {
 }
 func (crawler *LinkedinCrawler) onHtml(e *colly.HTMLElement) {
 	link := e.Attr("href")
-	if strings.Contains(link, "https://www.linkedin.com/jobs/") {
+	if strings.Contains(link, "linkedin") && strings.Contains(link, "/jobs/") && strings.Contains(link, "/view/") {
 		crawler.jobLinks = append(crawler.jobLinks, link)
 	}
 }

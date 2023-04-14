@@ -68,7 +68,9 @@ func getQueue() (*queue.Queue, error) {
 	)
 }
 func (extractor *LinkedinExtractor) StartExtraction(links models.Link) error {
-	extractor.jobDetails = jobdetails.JobDetails{}
+	extractor.jobDetails = jobdetails.JobDetails{
+		JobLink: links.Url,
+	}
 
 	queue, _ := getQueue()
 	queue.AddURL(links.Url)
