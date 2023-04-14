@@ -18,8 +18,9 @@ import (
 
 type ScrapperLambdaStackProps struct {
 	awscdk.StackProps
-	Queues           map[constants.HostName]awssqs.Queue
+	Queues           map[constants.HostName]awssqs.IQueue
 	DatabaseSNSTopic *awssns.Topic
+	DeadLetterQueue  awssqs.IQueue
 }
 
 func NewScrapperLambdaStack(scope constructs.Construct, id string, props *ScrapperLambdaStackProps) awscdk.Stack {
@@ -39,8 +40,11 @@ func NewScrapperLambdaStack(scope constructs.Construct, id string, props *Scrapp
 			Handler:      jsii.String("scrapper"),
 			Code:         awslambda.Code_FromAsset(jsii.String("./../scrapper/main.zip"), &awss3assets.AssetOptions{}),
 			FunctionName: jsii.String(fmt.Sprintf("%s-scrapper-lambda-fn", hostName)),
+			Timeout:      awscdk.Duration_Seconds(jsii.Number(5)),
 		})
 		scrapperQueue.GrantConsumeMessages(lambdaFunction)
+		props.DeadLetterQueue.GrantSendMessages(lambdaFunction)
+
 		(*props.DatabaseSNSTopic).GrantPublish(lambdaFunction)
 
 		triggerEvent := lambdaEvent.NewSqsEventSource(scrapperQueue, &lambdaEvent.SqsEventSourceProps{

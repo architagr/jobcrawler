@@ -27,7 +27,7 @@ func main() {
 
 	stackProps := env(app)
 	//#region create queues
-	_, scrapperQueues := scrappersqs.NewScrapperSqsStack(app, "ScrapperQueues", &scrappersqs.ScrapperSqsStackProps{
+	_, scrapperQueues, scrapperDLQueue := scrappersqs.NewScrapperSqsStack(app, "ScrapperQueues", &scrappersqs.ScrapperSqsStackProps{
 		StackProps: stackProps,
 		HostNames: map[constants.HostName]float64{
 			constants.HostName_Linkedin: float64(1),
@@ -35,7 +35,7 @@ func main() {
 		},
 	})
 
-	_, databaseQueues := databasesqs.NewDatabaseSQSStack(app, "DatabaseQueues", &databasesqs.DatabaseSQSStackProps{
+	_, databaseQueues, databaseDLQueue := databasesqs.NewDatabaseSQSStack(app, "DatabaseQueues", &databasesqs.DatabaseSQSStackProps{
 		StackProps: stackProps,
 		HostNames: map[constants.HostName]float64{
 			constants.HostName_Linkedin: float64(1),
@@ -43,7 +43,7 @@ func main() {
 		},
 	})
 
-	_, crawlerQueues := crawlersqs.NewCrawlerSQSStack(app, "CrawlerQueues", &crawlersqs.CrawlerSQSStackProps{
+	_, crawlerQueues, crawlerDLQueue := crawlersqs.NewCrawlerSQSStack(app, "CrawlerQueues", &crawlersqs.CrawlerSQSStackProps{
 		StackProps: stackProps,
 		HostNames: map[constants.HostName]float64{
 			constants.HostName_Linkedin: float64(1),
@@ -74,17 +74,20 @@ func main() {
 		StackProps:       stackProps,
 		Queues:           scrapperQueues,
 		DatabaseSNSTopic: databaseTopic,
+		DeadLetterQueue:  scrapperDLQueue,
 	})
 
 	databaselambda.NewDatabaseLambdaStack(app, "DatabaseLambda", &databaselambda.DatabaseLambdaStackProps{
-		StackProps: stackProps,
-		Queues:     databaseQueues,
+		StackProps:      stackProps,
+		Queues:          databaseQueues,
+		DeadLetterQueue: databaseDLQueue,
 	})
 
 	crawlerlambda.NewCrawlerLambdaStack(app, "CrawlerLambda", &crawlerlambda.CrawlerLambdaStackProps{
 		StackProps:       stackProps,
 		ScrapperSNSTopic: scrapperTopic,
 		CrawlerQueues:    crawlerQueues,
+		DeadLetterQueue:  crawlerDLQueue,
 	})
 
 	orchestrationlambda.NewOrchestrationLambdaStack(app, "OrchestrationLambda", &orchestrationlambda.OrchestrationLambdaStackProps{

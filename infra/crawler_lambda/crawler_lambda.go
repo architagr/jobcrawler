@@ -19,7 +19,8 @@ import (
 type CrawlerLambdaStackProps struct {
 	awscdk.StackProps
 	ScrapperSNSTopic *awssns.Topic
-	CrawlerQueues    map[constants.HostName]awssqs.Queue
+	CrawlerQueues    map[constants.HostName]awssqs.IQueue
+	DeadLetterQueue  awssqs.IQueue
 }
 
 func NewCrawlerLambdaStack(scope constructs.Construct, id string, props *CrawlerLambdaStackProps) awscdk.Stack {
@@ -38,8 +39,11 @@ func NewCrawlerLambdaStack(scope constructs.Construct, id string, props *Crawler
 			Handler:      jsii.String("webcrawler"),
 			Code:         awslambda.Code_FromAsset(jsii.String("./../webcrawler/main.zip"), &awss3assets.AssetOptions{}),
 			FunctionName: jsii.String(fmt.Sprintf("%s-crawler-lambda-fn", hostName)),
+			Timeout:      awscdk.Duration_Seconds(jsii.Number(5)),
 		})
 		crawlerQueue.GrantConsumeMessages(lambdaFunction)
+		props.DeadLetterQueue.GrantSendMessages(lambdaFunction)
+
 		(*props.ScrapperSNSTopic).GrantPublish(lambdaFunction)
 
 		triggerEvent := lambdaEvent.NewSqsEventSource(crawlerQueue, &lambdaEvent.SqsEventSourceProps{

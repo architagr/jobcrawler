@@ -16,27 +16,39 @@ type CrawlerSQSStackProps struct {
 	HostNames map[constants.HostName]float64
 }
 
-func NewCrawlerSQSStack(scope constructs.Construct, id string, props *CrawlerSQSStackProps) (awscdk.Stack, map[constants.HostName]awssqs.Queue) {
+func NewCrawlerSQSStack(scope constructs.Construct, id string, props *CrawlerSQSStackProps) (awscdk.Stack, map[constants.HostName]awssqs.IQueue, awssqs.IQueue) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
 	}
 
 	stack := awscdk.NewStack(scope, &id, &sprops)
-	queues := make(map[constants.HostName]awssqs.Queue)
+	queues := make(map[constants.HostName]awssqs.IQueue)
 
-	// TODO: add a deadletter queue
+	deadletterQueue := createDeadLetterQueue(stack, props)
+
 	for hostName, delay := range props.HostNames {
 		queueId := aws.String(fmt.Sprintf("%sCrawlerQueue", hostName))
 		queues[hostName] = awssqs.NewQueue(stack, queueId, &awssqs.QueueProps{
 			QueueName:           aws.String(fmt.Sprintf("%s-crawler-queue", hostName)),
 			RetentionPeriod:     awscdk.Duration_Days(jsii.Number(1)),
 			MaxMessageSizeBytes: jsii.Number(262144),
-			VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(300)),
+			VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(10)),
 			DeliveryDelay:       awscdk.Duration_Seconds(jsii.Number(delay)),
 			Encryption:          awssqs.QueueEncryption_UNENCRYPTED,
+			DeadLetterQueue: &awssqs.DeadLetterQueue{
+				MaxReceiveCount: aws.Float64(5),
+				Queue:           deadletterQueue,
+			},
 		})
 	}
 
-	return stack, queues
+	return stack, queues, deadletterQueue
+}
+
+func createDeadLetterQueue(stack awscdk.Stack, props *CrawlerSQSStackProps) awssqs.IQueue {
+	return awssqs.NewQueue(stack, aws.String("CrawlerDeadLetterQueue"), &awssqs.QueueProps{
+		QueueName:  aws.String("crawler-dead-letter-queue"),
+		Encryption: awssqs.QueueEncryption_UNENCRYPTED,
+	})
 }

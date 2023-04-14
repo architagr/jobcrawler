@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"jobcrawler/config"
 	"jobcrawler/crawler"
 	"jobcrawler/crawler/linkedin"
@@ -25,15 +24,15 @@ func main() {
 	lambda.Start(handler)
 }
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
-	notify := notification.GetNotificationObj()
 	log.Printf("lambda handler start")
-
+	notify := notification.GetNotificationObj()
 	for _, message := range sqsEvent.Records {
 		data := new(sqs_message.MessageBody)
+		log.Printf("MessageBody %s", data)
 		json.Unmarshal([]byte(message.Body), data)
 		messageContent := new(notificationModel.Notification[string])
 		json.Unmarshal([]byte(data.Message), messageContent)
-		fmt.Printf("The message %s for event source %s, mesageContent: %+v \n", message.MessageId, message.EventSource, messageContent)
+		log.Printf("The message %s for event source %s, mesageContent: %+v \n", message.MessageId, message.EventSource, messageContent)
 		crawlerObj := getCrawlerObj(messageContent.HostName, &messageContent.SearchCondition, notify)
 		crawlerObj.StartCrawler(messageContent.Data)
 	}
