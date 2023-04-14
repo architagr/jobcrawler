@@ -2,6 +2,7 @@ package extractor
 
 import (
 	"log"
+	"regexp"
 	"scrapper/models"
 	"scrapper/notification"
 	"strings"
@@ -27,10 +28,11 @@ type LinkedinExtractor struct {
 
 func initLinkedInExtractor(search searchcondition.SearchCondition, notification *notification.Notification) IExtractor {
 	c := colly.NewCollector(
-		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
+		//colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
 		constants.UserAgent,
 		constants.MaxDepth,
 		colly.AllowURLRevisit(),
+		colly.URLFilters(regexp.MustCompile("^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com")),
 	)
 
 	q, _ := getQueue()
