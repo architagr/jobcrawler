@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"jobcrawler/config"
+	"jobcrawler/crawler"
+	"jobcrawler/crawler/linkedin"
 	"jobcrawler/notification"
-	"jobcrawler/urlfrontier"
-	"jobcrawler/urlseeding"
 	"log"
-	"sync"
 
 	"github.com/architagr/common-constants/constants"
-
+	searchcondition "github.com/architagr/common-models/search-condition"
 	notificationModel "github.com/architagr/common-models/sns-notification"
 
 	sqs_message "github.com/architagr/common-models/sqs-message"
@@ -28,28 +27,26 @@ func main() {
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	notify := notification.GetNotificationObj()
 	log.Printf("lambda handler start")
-	wg := sync.WaitGroup{}
+
 	for _, message := range sqsEvent.Records {
 		data := new(sqs_message.MessageBody)
 		json.Unmarshal([]byte(message.Body), data)
 		messageContent := new(notificationModel.Notification[string])
 		json.Unmarshal([]byte(data.Message), messageContent)
 		fmt.Printf("The message %s for event source %s, mesageContent: %+v \n", message.MessageId, message.EventSource, messageContent)
-		frontier := urlfrontier.InitUrlFrontier(&messageContent.SearchCondition, map[constants.HostName]urlseeding.CrawlerLinks{
-			messageContent.HostName: {
-				DelayInMilliseconds: 1000,
-				Parallisim:          1,
-				Links: []urlseeding.Link{
-					{
-						Url:        messageContent.Data,
-						RetryCount: 5,
-					},
-				},
-			},
-		}, notify)
-
-		frontier.Start(&wg)
+		crawlerObj := getCrawlerObj(messageContent.HostName, &messageContent.SearchCondition, notify)
+		crawlerObj.StartCrawler(messageContent.Data)
 	}
 
 	return nil
+}
+
+func getCrawlerObj(hostName constants.HostName, searchParams *searchcondition.SearchCondition, notifier *notification.Notification) crawler.ICrawler {
+	var crawlerObj crawler.ICrawler
+	switch hostName {
+	case constants.HostName_Linkedin:
+		crawlerObj = linkedin.InitLinkedInCrawler(*searchParams, notifier)
+	}
+
+	return crawlerObj
 }

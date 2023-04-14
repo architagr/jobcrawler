@@ -16,4 +16,5 @@ type JobDetails struct {
 	Experience string `json:"experience"`
 
 	Description string `json:"description"`
+	JobLink     string `json:"jobLink"`
 }

@@ -1,10 +1,6 @@
 package crawler
 
-import (
-	"jobcrawler/urlseeding"
-)
-
 type ICrawler interface {
-	StartCrawler(links []urlseeding.Link) []string
+	StartCrawler(link string) []string
 	GetJobLinks() []string
 }
