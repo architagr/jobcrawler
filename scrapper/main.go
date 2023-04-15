@@ -50,4 +50,21 @@ func main() {
 	config.InitConfig()
 	notificationObj = notification.GetNotificationObj()
 	lambda.Start(handler)
+
+	// used for local testing
+	// extractor := extractor.InitExtractor(constants.HostName_Linkedin, searchcondition.SearchCondition{
+	// 	JobTitle:     "Digital Marketing",
+	// 	LocationInfo: searchcondition.Location{Country: "India", City: "any"},
+	// 	JobType:      "Full Time",
+	// 	JobModel:     "On site",
+	// 	RoleName:     "Digital Marketing",
+	// 	Experience:   "Entry Level"}, notificationObj)
+
+	// err := extractor.StartExtraction(models.Link{
+	// 	Url: "https://in.linkedin.com/jobs/view/content-writer-at-booming-bulls-academy™-3518908019?refId=vjyFYLCQM4HGwsCQgE0w2Q%3D%3D&trackingId=dU66ZkdC6yXQMsnUitOR8Q%3D%3D&position=10&pageNum=3&trk=public_jobs_jserp-result_search-card",
+	// })
+	// if err != nil {
+	// 	log.Printf("error: %+v", err)
+	// 	// return err
+	// }
 }
