@@ -15,9 +15,13 @@ import (
 func main() {
 	log.Printf("lambda start")
 	lambda.Start(handler)
-
+	// to be used for local
+	//handle()
 }
 func handler(ctx context.Context, sqsEvent interface{}) error {
+	return handle()
+}
+func handle() error {
 	env := config.GetConfig()
 	notify := notification.GetNotificationObj()
 	conn := connection.InitConnection(env.GetDatabaseConnectionString(), 10)
