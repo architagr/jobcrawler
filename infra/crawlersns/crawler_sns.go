@@ -16,7 +16,7 @@ type CrawlerSNSStackProps struct {
 	CrawlerQueues map[constants.HostName]awssqs.IQueue
 }
 
-func NewCrawlerSNSStack(scope constructs.Construct, id string, props *CrawlerSNSStackProps) (awscdk.Stack, *awssns.Topic) {
+func NewCrawlerSNSStack(scope constructs.Construct, id string, props *CrawlerSNSStackProps) (awscdk.Stack, awssns.ITopic) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -34,5 +34,5 @@ func NewCrawlerSNSStack(scope constructs.Construct, id string, props *CrawlerSNS
 			FilterPolicy: &filter,
 		}))
 	}
-	return stack, &topic
+	return stack, topic
 }

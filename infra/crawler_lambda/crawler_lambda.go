@@ -18,7 +18,7 @@ import (
 
 type CrawlerLambdaStackProps struct {
 	awscdk.StackProps
-	ScrapperSNSTopic *awssns.Topic
+	ScrapperSNSTopic awssns.ITopic
 	CrawlerQueues    map[constants.HostName]awssqs.IQueue
 	DeadLetterQueue  awssqs.IQueue
 }
@@ -31,7 +31,7 @@ func NewCrawlerLambdaStack(scope constructs.Construct, id string, props *Crawler
 	stack := awscdk.NewStack(scope, &id, &sprops)
 	for hostName, crawlerQueue := range props.CrawlerQueues {
 		env := make(map[string]*string)
-		env["ScrapperSnsTopicArn"] = (*props.ScrapperSNSTopic).TopicArn()
+		env["ScrapperSnsTopicArn"] = props.ScrapperSNSTopic.TopicArn()
 
 		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sCrawlerLambda", hostName)), &awslambda.FunctionProps{
 			Environment:  &env,
@@ -43,8 +43,7 @@ func NewCrawlerLambdaStack(scope constructs.Construct, id string, props *Crawler
 		})
 		crawlerQueue.GrantConsumeMessages(lambdaFunction)
 		props.DeadLetterQueue.GrantSendMessages(lambdaFunction)
-
-		(*props.ScrapperSNSTopic).GrantPublish(lambdaFunction)
+		props.ScrapperSNSTopic.GrantPublish(lambdaFunction)
 
 		triggerEvent := lambdaEvent.NewSqsEventSource(crawlerQueue, &lambdaEvent.SqsEventSourceProps{
 			BatchSize:         jsii.Number(1),

@@ -8,6 +8,9 @@ import (
 	databaselambda "infra/database_lambda"
 	"infra/databasesns"
 	"infra/databasesqs"
+	monitoringlambda "infra/monitoring_lambda"
+	"infra/monitoringsns"
+	"infra/monitoringsqs"
 	orchestrationlambda "infra/orchestration_lambda"
 	scrapperlambda "infra/scrapper_lambda"
 
@@ -50,6 +53,10 @@ func main() {
 			constants.HostName_Indeed:   float64(1),
 		},
 	})
+
+	_, monitoringQueues, monitoringDLQueue := monitoringsqs.NewMonitoringSQSStack(app, "MonitoringQueue", &monitoringsqs.MonitoringSQSStackProps{
+		StackProps: stackProps,
+	})
 	//#endregion
 
 	//#region create SNS topics
@@ -66,6 +73,11 @@ func main() {
 	_, crawlerTopic := crawlersns.NewCrawlerSNSStack(app, "CrawlerTopic", &crawlersns.CrawlerSNSStackProps{
 		StackProps:    stackProps,
 		CrawlerQueues: crawlerQueues,
+	})
+
+	_, monitoringTopic := monitoringsns.NewMonitoringSNSStack(app, "MonitoringTopic", &monitoringsns.MonitoringSNSStackProps{
+		StackProps: stackProps,
+		Queue:      monitoringQueues,
 	})
 	//#endregion
 
@@ -91,8 +103,16 @@ func main() {
 	})
 
 	orchestrationlambda.NewOrchestrationLambdaStack(app, "OrchestrationLambda", &orchestrationlambda.OrchestrationLambdaStackProps{
-		StackProps:      stackProps,
-		CrawlerSNSTopic: crawlerTopic,
+		StackProps:         stackProps,
+		CrawlerSNSTopic:    crawlerTopic,
+		MonitoringSNSTopic: monitoringTopic,
+	})
+
+	monitoringlambda.NewMonitoringLambdaStack(app, "MonitoringLambda", &monitoringlambda.MonitoringLambdaStackProps{
+		StackProps:         stackProps,
+		MonitoringSNSTopic: monitoringTopic,
+		MonitoringQueue:    monitoringQueues,
+		DeadLetterQueue:    monitoringDLQueue,
 	})
 	//#endregion
 	app.Synth(nil)
