@@ -26,7 +26,7 @@ func NewMonitoringSQSStack(scope constructs.Construct, id string, props *Monitor
 		QueueName:           aws.String("monitoring-queue"),
 		RetentionPeriod:     awscdk.Duration_Days(jsii.Number(1)),
 		MaxMessageSizeBytes: jsii.Number(262144),
-		VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(10)),
+		VisibilityTimeout:   awscdk.Duration_Minutes(jsii.Number(6)),
 		DeliveryDelay:       awscdk.Duration_Minutes(jsii.Number(15)),
 		Encryption:          awssqs.QueueEncryption_UNENCRYPTED,
 		DeadLetterQueue: &awssqs.DeadLetterQueue{
