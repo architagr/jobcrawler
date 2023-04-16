@@ -16,6 +16,7 @@
             "DatabaseName":"webscrapper",
             "CollectionName":"jobLinks",
             "CrawlerSNSTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:crawler-sns-topic",
+            "MonitoringSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:monitoring-sns-topic"
           },
           "showLog": true
     }

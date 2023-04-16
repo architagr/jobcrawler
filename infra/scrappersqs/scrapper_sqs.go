@@ -29,12 +29,13 @@ func NewScrapperSqsStack(scope constructs.Construct, id string, props *ScrapperS
 	for hostName, delay := range props.HostNames {
 		queueId := aws.String(fmt.Sprintf("%sScrapperQueue", hostName))
 		queues[hostName] = awssqs.NewQueue(stack, queueId, &awssqs.QueueProps{
-			QueueName:           aws.String(fmt.Sprintf("%s-scrapper-queue", hostName)),
-			RetentionPeriod:     awscdk.Duration_Days(jsii.Number(1)),
-			MaxMessageSizeBytes: jsii.Number(262144),
-			VisibilityTimeout:   awscdk.Duration_Seconds(jsii.Number(10)),
-			DeliveryDelay:       awscdk.Duration_Seconds(jsii.Number(delay)),
-			Encryption:          awssqs.QueueEncryption_UNENCRYPTED,
+			QueueName:              aws.String(fmt.Sprintf("%s-scrapper-queue", hostName)),
+			RetentionPeriod:        awscdk.Duration_Days(jsii.Number(1)),
+			MaxMessageSizeBytes:    jsii.Number(262144),
+			VisibilityTimeout:      awscdk.Duration_Seconds(jsii.Number(10)),
+			DeliveryDelay:          awscdk.Duration_Seconds(jsii.Number(delay)),
+			ReceiveMessageWaitTime: awscdk.Duration_Seconds(jsii.Number(20)),
+			Encryption:             awssqs.QueueEncryption_UNENCRYPTED,
 			DeadLetterQueue: &awssqs.DeadLetterQueue{
 				MaxReceiveCount: aws.Float64(5),
 				Queue:           deadLetterQueue,

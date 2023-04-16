@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"monitorqueuelambda/config"
 	"monitorqueuelambda/notification"
@@ -17,12 +18,17 @@ func main() {
 	notification.InitNotificationService()
 	service.InitMonitoringService()
 	lambda.Start(handler)
+	//handle()
 }
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
+	return handle()
+}
+
+func handle() error {
 	svc := service.GetMonitoringService()
 	svc.StartMonitoring()
 	if svc.GetCountOfMessages() == 0 {
-		log.Panicf("No messages to process")
+		return fmt.Errorf("no messages to process")
 	}
 	notify := notification.GetNotificationObj()
 	notify.SendUrlNotificationToMonioring(svc.GetCountOfMessages())

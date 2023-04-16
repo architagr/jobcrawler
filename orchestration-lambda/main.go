@@ -16,7 +16,7 @@ func main() {
 	log.Printf("lambda start")
 	lambda.Start(handler)
 	// to be used for local
-	//handle()
+	// handle()
 }
 func handler(ctx context.Context, sqsEvent interface{}) error {
 	return handle()
@@ -37,5 +37,6 @@ func handle() error {
 		return err
 	}
 	svc.Start()
+	notify.SendNotificationToMonitoring(0)
 	return nil
 }

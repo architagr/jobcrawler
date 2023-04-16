@@ -60,7 +60,7 @@ func (svc *MonitoringService) StartMonitoring() {
 			go svc.countMessage(url, &wg)
 		}
 	}
-	wg.Done()
+	wg.Wait()
 	log.Printf("total pending message on queues are %d", svc.total)
 }
 func (svc *MonitoringService) GetCountOfMessages() int64 {

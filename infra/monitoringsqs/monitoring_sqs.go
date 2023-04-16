@@ -23,12 +23,13 @@ func NewMonitoringSQSStack(scope constructs.Construct, id string, props *Monitor
 	deadLetterQueue := createDeadLetterQueue(stack, props)
 
 	queue := awssqs.NewQueue(stack, aws.String("MonitoringQueue"), &awssqs.QueueProps{
-		QueueName:           aws.String("monitoring-queue"),
-		RetentionPeriod:     awscdk.Duration_Days(jsii.Number(1)),
-		MaxMessageSizeBytes: jsii.Number(262144),
-		VisibilityTimeout:   awscdk.Duration_Minutes(jsii.Number(6)),
-		DeliveryDelay:       awscdk.Duration_Minutes(jsii.Number(15)),
-		Encryption:          awssqs.QueueEncryption_UNENCRYPTED,
+		QueueName:              aws.String("monitoring-queue"),
+		RetentionPeriod:        awscdk.Duration_Days(jsii.Number(1)),
+		MaxMessageSizeBytes:    jsii.Number(262144),
+		VisibilityTimeout:      awscdk.Duration_Minutes(jsii.Number(6)),
+		DeliveryDelay:          awscdk.Duration_Minutes(jsii.Number(15)),
+		ReceiveMessageWaitTime: awscdk.Duration_Minutes(jsii.Number(20)),
+		Encryption:             awssqs.QueueEncryption_UNENCRYPTED,
 		DeadLetterQueue: &awssqs.DeadLetterQueue{
 			MaxReceiveCount: aws.Float64(5),
 			Queue:           deadLetterQueue,
