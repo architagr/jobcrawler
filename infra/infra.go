@@ -113,6 +113,9 @@ func main() {
 		MonitoringSNSTopic: monitoringTopic,
 		MonitoringQueue:    monitoringQueues,
 		DeadLetterQueue:    monitoringDLQueue,
+		DatabaseQueues:     databaseQueues,
+		CrawlerQueues:      crawlerQueues,
+		ScraperQueues:      scrapperQueues,
 	})
 	//#endregion
 	app.Synth(nil)

@@ -50,11 +50,14 @@ func (svc *MonitoringService) StartMonitoring() {
 	hostNames := []string{string(constants.HostName_Linkedin), string(constants.HostName_Indeed)}
 
 	for _, hostName := range hostNames {
-		list, _ := svc.sqsSvc.ListQueues(&sqs.ListQueuesInput{
+		list, err := svc.sqsSvc.ListQueues(&sqs.ListQueuesInput{
 			MaxResults:      aws.Int64(10),
 			QueueNamePrefix: aws.String(hostName),
 		})
-
+		if err != nil {
+			log.Printf("get list of queue error for host %s, error %+v", hostName, err)
+		}
+		log.Printf("list of queues for host %s are %+v", hostName, list)
 		for _, url := range list.QueueUrls {
 			wg.Add(1)
 			go svc.countMessage(url, &wg)
@@ -68,10 +71,15 @@ func (svc *MonitoringService) GetCountOfMessages() int64 {
 }
 func (svc *MonitoringService) countMessage(queueUrl *string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	attr, _ := svc.sqsSvc.GetQueueAttributes(&sqs.GetQueueAttributesInput{
+	attr, err := svc.sqsSvc.GetQueueAttributes(&sqs.GetQueueAttributesInput{
 		QueueUrl:       queueUrl,
 		AttributeNames: aws.StringSlice([]string{numberOfMessages, numberOfMessagesDelayed, numberOfMessagesNotVisible}),
 	})
+	if err != nil {
+		log.Printf("queue: %s, error %+v", *queueUrl, err)
+		return
+	}
+	log.Printf("queue: %s, attr %+v", *queueUrl, attr)
 	svc.mutex.Lock()
 	defer svc.mutex.Unlock()
 	noOfMessage := attr.Attributes[numberOfMessages]
