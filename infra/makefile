@@ -16,7 +16,7 @@ build:
 	make -C ../scrapper lambda-build
 	make -C ../database-lambda lambda-build
 	make -C ../monitor-queues-lambda lambda-build
-
+	make -C ../switch-table-lambda lambda-build
 
 clear:
 	make -C ../orchestration-lambda clear
@@ -24,7 +24,7 @@ clear:
 	make -C ../scrapper clear
 	make -C ../database-lambda clear
 	make -C ../monitor-queues-lambda clear
-
+	make -C ../switch-table-lambda clear
 
 bootstrap:
 	cdk bootstrap

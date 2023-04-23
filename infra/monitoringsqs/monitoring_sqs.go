@@ -41,7 +41,8 @@ func NewMonitoringSQSStack(scope constructs.Construct, id string, props *Monitor
 
 func createDeadLetterQueue(stack awscdk.Stack, props *MonitoringSQSStackProps) awssqs.IQueue {
 	return awssqs.NewQueue(stack, aws.String("MonitoringDeadLetterQueue"), &awssqs.QueueProps{
-		QueueName:  aws.String("monitoring-dead-letter-queue"),
-		Encryption: awssqs.QueueEncryption_UNENCRYPTED,
+		QueueName:         aws.String("monitoring-dead-letter-queue"),
+		Encryption:        awssqs.QueueEncryption_UNENCRYPTED,
+		VisibilityTimeout: awscdk.Duration_Minutes(jsii.Number(10)),
 	})
 }

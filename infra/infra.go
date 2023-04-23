@@ -12,7 +12,9 @@ import (
 	"infra/monitoringsns"
 	"infra/monitoringsqs"
 	orchestrationlambda "infra/orchestration_lambda"
+
 	scrapperlambda "infra/scrapper_lambda"
+	switchtablelambda "infra/switch_table_lambda"
 
 	"infra/scrappersns"
 	"infra/scrappersqs"
@@ -116,6 +118,10 @@ func main() {
 		DatabaseQueues:     databaseQueues,
 		CrawlerQueues:      crawlerQueues,
 		ScraperQueues:      scrapperQueues,
+	})
+	switchtablelambda.NewSwitchTableLambdaStack(app, "SwitchTableLambda", &switchtablelambda.SwitchLambdaLambdaStackProps{
+		StackProps:      stackProps,
+		DeadLetterQueue: monitoringDLQueue,
 	})
 	//#endregion
 	app.Synth(nil)

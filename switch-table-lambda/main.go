@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/architagr/repository/connection"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	_ "github.com/aws/aws-lambda-go/lambda"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,6 +25,9 @@ func main() {
 	log.Printf("lambda start")
 	env = config.GetConfig()
 	setupDB()
+	lambda.Start(handler)
+}
+func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	client, _, err := conn.GetConnction()
 	if err != nil {
 		log.Panic(err)
@@ -31,6 +36,7 @@ func main() {
 	createBackup(client)
 	swictCollection(client)
 	dropTempCollection(client)
+	return nil
 }
 func swictCollection(client *mongo.Client) {
 	log.Printf("renaming %s to %s", env.GetTempCollectionName(), env.GetFinalCollectionName())
@@ -47,7 +53,7 @@ func createBackup(client *mongo.Client) {
 	renameCollection(env.GetFinalCollectionNameWithDbName(), oldFinalTableBackup, client)
 }
 func renameCollection(oldName, newName string, client *mongo.Client) {
-	err := client.Database("admin").RunCommand(context.Background(), bson.D{
+	err := client.Database("admin").RunCommand(context.TODO(), bson.D{
 		{Key: "renameCollection", Value: oldName},
 		{Key: "to", Value: newName},
 		{Key: "dropTarget", Value: true},
