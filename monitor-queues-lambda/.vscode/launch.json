@@ -5,18 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-          "name": "Launch oschestration",
+          "name": "Launch queue monitoring",
           "type": "go",
           "request": "launch", 
           "mode": "debug",
           "program": "${workspaceFolder}/main.go",
           "args": [], 
           "env": {
-            "DbConnectionString":"mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority",
-            "DatabaseName":"webscrapper",
-            "CollectionName":"jobLinks",
-            "CrawlerSNSTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:crawler-sns-topic",
-            "MonitoringSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:monitoring-sns-topic"
+            "MonitoringSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:crawler-sns-topic",
           },
           "showLog": true
     }

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-          "name": "Launch oschestration",
+          "name": "Launch switch table",
           "type": "go",
           "request": "launch", 
           "mode": "debug",
@@ -14,9 +14,9 @@
           "env": {
             "DbConnectionString":"mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority",
             "DatabaseName":"webscrapper",
-            "CollectionName":"jobLinks",
-            "CrawlerSNSTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:crawler-sns-topic",
-            "MonitoringSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:monitoring-sns-topic"
+            "TempCollectionName":"arc_jobDetailsTemp",
+            "FinalCollectionName":"arc_jobDetails",
+
           },
           "showLog": true
     }

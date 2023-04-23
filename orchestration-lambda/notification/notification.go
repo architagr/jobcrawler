@@ -2,6 +2,7 @@ package notification
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"orchestration/config"
 
@@ -16,6 +17,7 @@ import (
 
 type INotification interface {
 	SendUrlNotificationToCrawler(search *searchcondition.SearchCondition, hostname constants.HostName, joblink string)
+	SendNotificationToMonitoring(count int64)
 }
 type Notification struct {
 	sns *sns.SNS
@@ -39,6 +41,16 @@ func GetNotificationObj() INotification {
 	}
 	return notification
 }
+func (notify *Notification) SendNotificationToMonitoring(count int64) {
+	env := config.GetConfig()
+	_, err := notify.sns.Publish(&sns.PublishInput{
+		Message:  aws.String(fmt.Sprintf("%d", count)),
+		TopicArn: jsii.String(env.GetMonitoringSNSTopic()),
+	})
+	if err != nil {
+		log.Printf("error while sending notification to %s, %+v", env.GetMonitoringSNSTopic(), err)
+	}
+}
 func (notify *Notification) SendUrlNotificationToCrawler(search *searchcondition.SearchCondition, hostname constants.HostName, joblink string) {
 	bytes, _ := json.Marshal(notificationModel.Notification[string]{
 		SearchCondition: *search,
@@ -57,6 +69,6 @@ func (notify *Notification) SendUrlNotificationToCrawler(search *searchcondition
 		TopicArn: jsii.String(env.GetCrawlerSNSTopicArn()),
 	})
 	if err != nil {
-		log.Printf("error while sending notification, %+v", err)
+		log.Printf("error while sending notification to %s, %+v", env.GetCrawlerSNSTopicArn(), err)
 	}
 }

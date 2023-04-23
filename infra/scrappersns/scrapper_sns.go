@@ -16,7 +16,7 @@ type ScrapperSnsStackProps struct {
 	Queues map[constants.HostName]awssqs.IQueue
 }
 
-func NewScrapperSnsStack(scope constructs.Construct, id string, props *ScrapperSnsStackProps) (awscdk.Stack, *awssns.Topic) {
+func NewScrapperSnsStack(scope constructs.Construct, id string, props *ScrapperSnsStackProps) (awscdk.Stack, awssns.ITopic) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -35,5 +35,5 @@ func NewScrapperSnsStack(scope constructs.Construct, id string, props *ScrapperS
 			FilterPolicy: &filter,
 		}))
 	}
-	return stack, &topic
+	return stack, topic
 }

@@ -24,6 +24,7 @@ func main() {
 	lambda.Start(handler)
 }
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
+
 	log.Printf("lambda handler start")
 	notify := notification.GetNotificationObj()
 	for _, message := range sqsEvent.Records {

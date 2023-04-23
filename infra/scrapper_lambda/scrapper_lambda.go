@@ -19,7 +19,7 @@ import (
 type ScrapperLambdaStackProps struct {
 	awscdk.StackProps
 	Queues           map[constants.HostName]awssqs.IQueue
-	DatabaseSNSTopic *awssns.Topic
+	DatabaseSNSTopic awssns.ITopic
 	DeadLetterQueue  awssqs.IQueue
 }
 
@@ -32,7 +32,7 @@ func NewScrapperLambdaStack(scope constructs.Construct, id string, props *Scrapp
 
 	for hostName, scrapperQueue := range props.Queues {
 		env := make(map[string]*string)
-		env["DatabaseSNSTopicArn"] = (*props.DatabaseSNSTopic).TopicArn()
+		env["DatabaseSNSTopicArn"] = props.DatabaseSNSTopic.TopicArn()
 
 		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sScrapperLambda", hostName)), &awslambda.FunctionProps{
 			Environment:  &env,
@@ -45,7 +45,7 @@ func NewScrapperLambdaStack(scope constructs.Construct, id string, props *Scrapp
 		scrapperQueue.GrantConsumeMessages(lambdaFunction)
 		props.DeadLetterQueue.GrantSendMessages(lambdaFunction)
 
-		(*props.DatabaseSNSTopic).GrantPublish(lambdaFunction)
+		props.DatabaseSNSTopic.GrantPublish(lambdaFunction)
 
 		triggerEvent := lambdaEvent.NewSqsEventSource(scrapperQueue, &lambdaEvent.SqsEventSourceProps{
 			BatchSize:         jsii.Number(1),

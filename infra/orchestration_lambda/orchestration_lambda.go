@@ -17,7 +17,8 @@ import (
 
 type OrchestrationLambdaStackProps struct {
 	awscdk.StackProps
-	CrawlerSNSTopic *awssns.Topic
+	CrawlerSNSTopic    awssns.ITopic
+	MonitoringSNSTopic awssns.ITopic
 }
 
 func NewOrchestrationLambdaStack(scope constructs.Construct, id string, props *OrchestrationLambdaStackProps) awscdk.Stack {
@@ -27,10 +28,11 @@ func NewOrchestrationLambdaStack(scope constructs.Construct, id string, props *O
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 	env := make(map[string]*string)
-	env["CrawlerSNSTopicArn"] = (*props.CrawlerSNSTopic).TopicArn()
+	env["CrawlerSNSTopicArn"] = props.CrawlerSNSTopic.TopicArn()
 	env["DbConnectionString"] = jsii.String("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority")
 	env["DatabaseName"] = jsii.String("webscrapper")
 	env["CollectionName"] = jsii.String("jobLinks")
+	env["MonitoringSnsTopicArn"] = props.MonitoringSNSTopic.TopicArn()
 
 	lambdaFunction := awslambda.NewFunction(stack, jsii.String("OrchestrationLambda"), &awslambda.FunctionProps{
 		Environment:  &env,
@@ -40,7 +42,8 @@ func NewOrchestrationLambdaStack(scope constructs.Construct, id string, props *O
 		FunctionName: jsii.String("orchestration-lambda-fn"),
 		Timeout:      awscdk.Duration_Seconds(jsii.Number(300)),
 	})
-	(*props.CrawlerSNSTopic).GrantPublish(lambdaFunction)
+	props.CrawlerSNSTopic.GrantPublish(lambdaFunction)
+	props.MonitoringSNSTopic.GrantPublish(lambdaFunction)
 
 	eventRule := awsevents.NewRule(stack, aws.String("TriggerOrchestrationLambdaEvent"), &awsevents.RuleProps{
 		Schedule: awsevents.Schedule_Cron(&awsevents.CronOptions{Hour: aws.String("0"), Minute: aws.String("0")}),

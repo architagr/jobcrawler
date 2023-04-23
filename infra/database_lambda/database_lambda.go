@@ -31,7 +31,7 @@ func NewDatabaseLambdaStack(scope constructs.Construct, id string, props *Databa
 		env := make(map[string]*string)
 		env["DbConnectionString"] = jsii.String("mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority")
 		env["DatabaseName"] = jsii.String("webscrapper")
-		env["CollectionName"] = jsii.String("jobDetails")
+		env["CollectionName"] = jsii.String("jobDetailsTemp")
 
 		lambdaFunction := awslambda.NewFunction(stack, jsii.String(fmt.Sprintf("%sDatabaseLambda", hostName)), &awslambda.FunctionProps{
 			Environment:  &env,

@@ -16,7 +16,7 @@ type DatabaseSNSStackProps struct {
 	Queues map[constants.HostName]awssqs.IQueue
 }
 
-func NewDatabaseSNSStack(scope constructs.Construct, id string, props *DatabaseSNSStackProps) (awscdk.Stack, *awssns.Topic) {
+func NewDatabaseSNSStack(scope constructs.Construct, id string, props *DatabaseSNSStackProps) (awscdk.Stack, awssns.ITopic) {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -34,5 +34,5 @@ func NewDatabaseSNSStack(scope constructs.Construct, id string, props *DatabaseS
 			FilterPolicy: &filter,
 		}))
 	}
-	return stack, &topic
+	return stack, topic
 }
