@@ -60,8 +60,11 @@ func main() {
 	// 	RoleName:     "Digital Marketing",
 	// 	Experience:   "Entry Level"}, notificationObj)
 
+	// // err := extractor.StartExtraction(models.Link{
+	// // 	Url: "https://in.linkedin.com/jobs/view/web-copywriter-at-self-employed-3546683890?refId=6nLGeVyAiD5U2Yy1BIdq3Q%3D%3D&trackingId=mb%2B0d76NGqSeweC5W1gEzg%3D%3D&position=9&pageNum=8&trk=public_jobs_jserp-result_search-card",
+	// // })
 	// err := extractor.StartExtraction(models.Link{
-	// 	Url: "https://in.linkedin.com/jobs/view/content-writer-at-booming-bulls-academy™-3518908019?refId=vjyFYLCQM4HGwsCQgE0w2Q%3D%3D&trackingId=dU66ZkdC6yXQMsnUitOR8Q%3D%3D&position=10&pageNum=3&trk=public_jobs_jserp-result_search-card",
+	// 	Url: "https://in.linkedin.com/jobs/view/strategy-growth-at-winzo-3587654831?refId=kkrwwq2j5JaG2vu5qSwbGw%3D%3D&trackingId=Kt5ViF35mBOISU9DVAyZXw%3D%3D&trk=public_jobs_topcard-title",
 	// })
 	// if err != nil {
 	// 	log.Printf("error: %+v", err)

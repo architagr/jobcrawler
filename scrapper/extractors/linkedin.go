@@ -58,7 +58,7 @@ func initLinkedInExtractor(search searchcondition.SearchCondition, notification 
 	linkedinCrawler.collector.OnHTML(".topcard__org-name-link", linkedinCrawler.companyName)
 	linkedinCrawler.collector.OnHTML("span.topcard__flavor.topcard__flavor--bullet", linkedinCrawler.location)
 	linkedinCrawler.collector.OnHTML("a.topcard__org-name-link.topcard__flavor--black-link", linkedinCrawler.comapnyDetailsUrl)
-	linkedinCrawler.collector.OnHTML(".description__text.description__text--rich", linkedinCrawler.description)
+	linkedinCrawler.collector.OnHTML(".description__text.description__text--rich .show-more-less-html__markup", linkedinCrawler.description)
 
 	linkedinCrawler.collector.OnHTML(".description__job-criteria-text.description__job-criteria-text--criteria", linkedinCrawler.additionalDetails)
 	return linkedinCrawler
@@ -86,6 +86,7 @@ func sanatizeString(nStr string) string {
 	nStr = strings.ReplaceAll(nStr, "\n", "")
 	nStr = strings.TrimSpace(nStr)
 	nStr = strings.Trim(nStr, "\t \n")
+	nStr = strings.TrimRight(nStr, "<br/>")
 	return nStr
 }
 func (extractor *LinkedinExtractor) onRequest(r *colly.Request) {
@@ -120,7 +121,8 @@ func (extractor *LinkedinExtractor) additionalDetails(e *colly.HTMLElement) {
 }
 
 func (extractor *LinkedinExtractor) description(e *colly.HTMLElement) {
-	extractor.jobDetails.Description = sanatizeString(e.Text)
+	x, _ := e.DOM.Html()
+	extractor.jobDetails.Description = sanatizeString(x)
 }
 
 func (extractor *LinkedinExtractor) comapnyDetailsUrl(e *colly.HTMLElement) {
