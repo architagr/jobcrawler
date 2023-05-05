@@ -6,6 +6,7 @@ import (
 	"scrapper/models"
 	"scrapper/notification"
 	"strings"
+	"time"
 
 	"github.com/architagr/common-constants/constants"
 	jobdetails "github.com/architagr/common-models/job-details"
@@ -60,7 +61,9 @@ func initLinkedInExtractor(search searchcondition.SearchCondition, notification 
 	linkedinCrawler.collector.OnHTML("a.topcard__org-name-link.topcard__flavor--black-link", linkedinCrawler.comapnyDetailsUrl)
 	linkedinCrawler.collector.OnHTML(".description__text.description__text--rich .show-more-less-html__markup", linkedinCrawler.description)
 
-	linkedinCrawler.collector.OnHTML(".description__job-criteria-text.description__job-criteria-text--criteria", linkedinCrawler.additionalDetails)
+	linkedinCrawler.collector.OnHTML(".posted-time-ago__text.topcard__flavor--metadata", linkedinCrawler.postAge)
+	linkedinCrawler.collector.OnHTML(".description__job-criteria-list", linkedinCrawler.aditionalDataTest)
+
 	return linkedinCrawler
 }
 func getQueue() (*queue.Queue, error) {
@@ -71,7 +74,10 @@ func getQueue() (*queue.Queue, error) {
 }
 func (extractor *LinkedinExtractor) StartExtraction(links models.Link) error {
 	extractor.jobDetails = jobdetails.JobDetails{
-		JobLink: links.Url,
+		JobLink:           links.Url,
+		JobModel:          extractor.search.JobModel,
+		SearchCondition:   extractor.search,
+		JobExtractionDate: time.Now(),
 	}
 
 	queue, _ := getQueue()
@@ -104,6 +110,10 @@ func (extractor *LinkedinExtractor) title(e *colly.HTMLElement) {
 	extractor.jobDetails.Title = sanatizeString(e.Text)
 }
 
+func (extractor *LinkedinExtractor) postAge(e *colly.HTMLElement) {
+	extractor.jobDetails.AgeOfPost = sanatizeString(e.Text)
+}
+
 func (extractor *LinkedinExtractor) companyName(e *colly.HTMLElement) {
 	extractor.jobDetails.CompanyName = sanatizeString(e.Text)
 }
@@ -112,12 +122,21 @@ func (extractor *LinkedinExtractor) location(e *colly.HTMLElement) {
 	extractor.jobDetails.Location = sanatizeString(e.Text)
 }
 
-func (extractor *LinkedinExtractor) additionalDetails(e *colly.HTMLElement) {
-	if e.Index == 0 {
-		extractor.jobDetails.Experience = sanatizeString(e.Text)
-	} else if e.Index == 1 {
-		extractor.jobDetails.JobType = sanatizeString(e.Text)
-	}
+func (extractor *LinkedinExtractor) aditionalDataTest(e *colly.HTMLElement) {
+
+	e.ForEach("li", func(index int, list *colly.HTMLElement) {
+		title := sanatizeString(list.ChildText(".description__job-criteria-subheader"))
+		text := sanatizeString(list.ChildText(".description__job-criteria-text.description__job-criteria-text--criteria"))
+		if title == "Seniority level" {
+			extractor.jobDetails.Experience = constants.ExperienceLevel(text)
+		} else if title == "Employment type" {
+			extractor.jobDetails.JobType = constants.JobType(text)
+		} else if title == "Job function" {
+			extractor.jobDetails.JobFunction = text
+		} else if title == "Industries" {
+			extractor.jobDetails.Industry = text
+		}
+	})
 }
 
 func (extractor *LinkedinExtractor) description(e *colly.HTMLElement) {

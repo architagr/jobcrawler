@@ -14,16 +14,16 @@ const (
 	HostName_Indeed   HostName = "indeed"
 )
 const (
-	ExperienceLevel_EntryLevel     = "Entry Level"
-	ExperienceLevel_Internship     = "Internship"
-	ExperienceLevel_Associate      = "Associate"
-	ExperienceLevel_MidSeniorLevel = "Mid-Senior Level"
-	ExperienceLevel_Director       = "Director"
+	ExperienceLevel_EntryLevel     ExperienceLevel = "Entry level"
+	ExperienceLevel_Internship     ExperienceLevel = "Internship"
+	ExperienceLevel_Associate      ExperienceLevel = "Associate"
+	ExperienceLevel_MidSeniorLevel ExperienceLevel = "Mid-Senior level"
+	ExperienceLevel_Director       ExperienceLevel = "Director"
 )
 
 const (
-	JobType_FullTime   JobType = "Full Time"
-	JobType_PartTime   JobType = "Part Time"
+	JobType_FullTime   JobType = "Full-time"
+	JobType_PartTime   JobType = "Part-time"
 	JobType_Contract   JobType = "Contract"
 	JobType_Temporary  JobType = "Temporary"
 	JobType_Volunteer  JobType = "Volunteer"
