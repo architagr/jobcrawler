@@ -55,10 +55,10 @@ func main() {
 	// extractor := extractor.InitExtractor(constants.HostName_Linkedin, searchcondition.SearchCondition{
 	// 	JobTitle:     "Digital Marketing",
 	// 	LocationInfo: searchcondition.Location{Country: "India", City: "any"},
-	// 	JobType:      "Full Time",
-	// 	JobModel:     "On site",
+	// 	JobType:      constants.JobType_FullTime,
+	// 	JobModel:     constants.JobModel_OnSite,
 	// 	RoleName:     "Digital Marketing",
-	// 	Experience:   "Entry Level"}, notificationObj)
+	// 	Experience:   constants.ExperienceLevel_EntryLevel}, notificationObj)
 
 	// // err := extractor.StartExtraction(models.Link{
 	// // 	Url: "https://in.linkedin.com/jobs/view/web-copywriter-at-self-employed-3546683890?refId=6nLGeVyAiD5U2Yy1BIdq3Q%3D%3D&trackingId=mb%2B0d76NGqSeweC5W1gEzg%3D%3D&position=9&pageNum=8&trk=public_jobs_jserp-result_search-card",
@@ -68,6 +68,6 @@ func main() {
 	// })
 	// if err != nil {
 	// 	log.Printf("error: %+v", err)
-	// 	// return err
+	// 	return err
 	// }
 }
