@@ -12,9 +12,9 @@ require (
 )
 
 replace (
-	github.com/architagr/common-constants => /Users/architagarwal/code/jobcrawler/common-constants
-	github.com/architagr/common-models => /Users/architagarwal/code/jobcrawler/common-models
-	github.com/architagr/repository => /Users/architagarwal/code/jobcrawler/repository
+	github.com/architagr/common-constants => ./../common-constants
+	github.com/architagr/common-models => ./../common-models
+	github.com/architagr/repository => ./../repository
 )
 
 require (

@@ -36,4 +36,4 @@ require (
 	google.golang.org/protobuf v1.24.0 // indirect
 )
 
-replace github.com/architagr/common-constants => /Users/architagarwal/code/jobcrawler/common-constants
+replace github.com/architagr/common-constants => ./../common-constants
