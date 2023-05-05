@@ -1,7 +1,6 @@
-package linkedin
+package crawler
 
 import (
-	"jobcrawler/crawler"
 	"jobcrawler/notification"
 	"log"
 	"strings"
@@ -23,7 +22,7 @@ type LinkedinCrawler struct {
 	notification *notification.Notification
 }
 
-func InitLinkedInCrawler(search searchcondition.SearchCondition, notification *notification.Notification) crawler.ICrawler {
+func InitLinkedInCrawler(search searchcondition.SearchCondition, notification *notification.Notification) ICrawler {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
 		constants.UserAgent,

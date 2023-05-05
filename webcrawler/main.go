@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"jobcrawler/config"
 	"jobcrawler/crawler"
-	"jobcrawler/crawler/linkedin"
 	"jobcrawler/notification"
 	"log"
 
@@ -45,7 +44,7 @@ func getCrawlerObj(hostName constants.HostName, searchParams *searchcondition.Se
 	var crawlerObj crawler.ICrawler
 	switch hostName {
 	case constants.HostName_Linkedin:
-		crawlerObj = linkedin.InitLinkedInCrawler(*searchParams, notifier)
+		crawlerObj = crawler.InitLinkedInCrawler(*searchParams, notifier)
 	}
 
 	return crawlerObj
