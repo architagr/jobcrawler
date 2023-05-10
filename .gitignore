@@ -17,3 +17,4 @@
 *.zip
 .DS_Store
 *.code-workspace
+coverage.*

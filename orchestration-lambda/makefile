@@ -6,3 +6,6 @@ lambda-build:
 
 clear:
 	rm -f orchestration main.zip
+
+test:
+	go test `go list ./... | grep -v examples` -coverprofile=coverage.txt -covermode=atomic
