@@ -41,6 +41,8 @@ jobs:
         run: |
           cd orchestration-lambda
           go test `go list ./... | grep -v examples` -coverprofile=../orchestration-coverage.txt -covermode=atomic
+      - name: print file
+        run: echo $(cat ./orchestration-coverage.txt)
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
