@@ -1,8 +1,8 @@
 package service
 
 import (
-	"orchestration/config"
-	"orchestration/notification"
+	"orchestration-lambda/config"
+	"orchestration-lambda/notification"
 
 	jobcrawlerlinks "github.com/architagr/common-models/job-crawler-links"
 

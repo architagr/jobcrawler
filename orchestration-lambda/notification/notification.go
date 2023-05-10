@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"orchestration/config"
+	"orchestration-lambda/config"
 
 	"github.com/architagr/common-constants/constants"
 	searchcondition "github.com/architagr/common-models/search-condition"
