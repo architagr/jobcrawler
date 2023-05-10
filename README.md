@@ -3,7 +3,6 @@
 This project is intended to crawl jobs from different potals and have them in database.
 for now we have pushed jobs to Mongodb, but can be pushed to any DB of choice
 
-<hr>
 We have 6 major components :
 
 ## Orchestration
