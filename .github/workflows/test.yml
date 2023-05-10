@@ -45,6 +45,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: 947db02d-7752-41fe-8902-a084b0a8e39a
-          file: ./orchestration-coverage.txt
+          files: ./orchestration-coverage.txt
           flags: unittests
           name: codecov-umbrella
