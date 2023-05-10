@@ -11,7 +11,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.19]
+        go-version: [1.20]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -23,7 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run tests
-        run: go test ./... -v -covermode=count
+        run: cd orchestration-lambda && go test ./... -v -covermode=count
 
   coverage:
     runs-on: ubuntu-latest
@@ -37,11 +37,11 @@ jobs:
         uses: actions/checkout@v2
       - name: Calc coverage
         run: |
-          go test `go list ./... | grep -v examples` -coverprofile=coverage.txt -covermode=atomic
+          make -C orchestration-lambda test
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
           token: 947db02d-7752-41fe-8902-a084b0a8e39a
-          file: ./coverage.txt
+          file: orchestration-lambda/coverage.txt
           flags: unittests
           name: codecov-umbrella
