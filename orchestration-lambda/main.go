@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"log"
-	localAws "orchestration/aws"
-	"orchestration/config"
+	localAws "orchestration-lambda/aws"
+	"orchestration-lambda/config"
 
-	"orchestration/notification"
-	oschestrationService "orchestration/service"
+	"orchestration-lambda/notification"
+	oschestrationService "orchestration-lambda/service"
 
 	"github.com/architagr/repository/connection"
 	"github.com/aws/aws-lambda-go/lambda"

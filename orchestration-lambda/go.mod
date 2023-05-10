@@ -1,4 +1,4 @@
-module orchestration
+module orchestration-lambda
 
 go 1.20
 
