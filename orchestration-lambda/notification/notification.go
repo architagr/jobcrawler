@@ -10,55 +10,55 @@ import (
 	searchcondition "github.com/architagr/common-models/search-condition"
 	notificationModel "github.com/architagr/common-models/sns-notification"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 	"github.com/aws/jsii-runtime-go"
 )
 
 type INotification interface {
-	SendUrlNotificationToCrawler(search *searchcondition.SearchCondition, hostname constants.HostName, joblink string)
-	SendNotificationToMonitoring(count int64)
+	SendUrlNotificationToCrawler(search *searchcondition.SearchCondition, hostname constants.HostName, joblink string) error
+	SendNotificationToMonitoring(count int64) error
 }
 type Notification struct {
-	sns *sns.SNS
+	snsObj snsiface.SNSAPI
+	env    config.IConfig
 }
 
 var notification INotification
 
-func InitNotificationService() {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
-	svc := sns.New(sess)
+func InitNotificationService(snsObj snsiface.SNSAPI, env config.IConfig) INotification {
 	notification = &Notification{
-		sns: svc,
-	}
-}
-
-func GetNotificationObj() INotification {
-	if notification == nil {
-		InitNotificationService()
+		snsObj: snsObj,
+		env:    env,
 	}
 	return notification
 }
-func (notify *Notification) SendNotificationToMonitoring(count int64) {
+
+func GetNotificationObj() (INotification, error) {
+	if notification == nil {
+		return nil, fmt.Errorf("notification has not been initilized")
+	}
+	return notification, nil
+}
+func (notify *Notification) SendNotificationToMonitoring(count int64) error {
 	env := config.GetConfig()
-	_, err := notify.sns.Publish(&sns.PublishInput{
+	_, err := notify.snsObj.Publish(&sns.PublishInput{
 		Message:  aws.String(fmt.Sprintf("%d", count)),
 		TopicArn: jsii.String(env.GetMonitoringSNSTopic()),
 	})
 	if err != nil {
 		log.Printf("error while sending notification to %s, %+v", env.GetMonitoringSNSTopic(), err)
 	}
+	return err
 }
-func (notify *Notification) SendUrlNotificationToCrawler(search *searchcondition.SearchCondition, hostname constants.HostName, joblink string) {
+func (notify *Notification) SendUrlNotificationToCrawler(search *searchcondition.SearchCondition, hostname constants.HostName, joblink string) error {
 	bytes, _ := json.Marshal(notificationModel.Notification[string]{
 		SearchCondition: *search,
 		HostName:        hostname,
 		Data:            joblink,
 	})
 	env := config.GetConfig()
-	_, err := notify.sns.Publish(&sns.PublishInput{
+	_, err := notify.snsObj.Publish(&sns.PublishInput{
 		Message: aws.String(string(bytes)),
 		MessageAttributes: map[string]*sns.MessageAttributeValue{
 			"hostName": {
@@ -70,5 +70,7 @@ func (notify *Notification) SendUrlNotificationToCrawler(search *searchcondition
 	})
 	if err != nil {
 		log.Printf("error while sending notification to %s, %+v", env.GetCrawlerSNSTopicArn(), err)
+
 	}
+	return err
 }

@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"log"
+	localAws "orchestration/aws"
 	"orchestration/config"
+
 	"orchestration/notification"
 	oschestrationService "orchestration/service"
 
@@ -14,6 +16,7 @@ import (
 
 func main() {
 	log.Printf("lambda start")
+
 	lambda.Start(handler)
 	// to be used for local
 	// handle()
@@ -23,7 +26,7 @@ func handler(ctx context.Context, sqsEvent interface{}) error {
 }
 func handle() error {
 	env := config.GetConfig()
-	notify := notification.GetNotificationObj()
+	notify := initNotification(env)
 	conn := connection.InitConnection(env.GetDatabaseConnectionString(), 10)
 	err := conn.ValidateConnection()
 	if err != nil {
@@ -39,4 +42,10 @@ func handle() error {
 	svc.Start()
 	notify.SendNotificationToMonitoring(0)
 	return nil
+}
+
+func initNotification(env config.IConfig) notification.INotification {
+	snsSvc := localAws.GetSnsService()
+	notify := notification.InitNotificationService(snsSvc, env)
+	return notify
 }
