@@ -2,11 +2,14 @@ package config
 
 import "os"
 
+type IConfig interface {
+	GetScrapperSnsTopicArn() string
+}
 type Config struct {
 	scrapperSnsTopic string
 }
 
-var env *Config
+var env IConfig
 
 const (
 	scrapperSnsTopicArnKey = "ScrapperSnsTopicArn"
@@ -18,7 +21,7 @@ func InitConfig() {
 	}
 }
 
-func GetConfig() *Config {
+func GetConfig() IConfig {
 	if env == nil {
 		InitConfig()
 	}

@@ -2,6 +2,7 @@ package notification
 
 import (
 	"encoding/json"
+	"fmt"
 	"jobcrawler/config"
 	"log"
 
@@ -9,34 +10,37 @@ import (
 	searchcondition "github.com/architagr/common-models/search-condition"
 	notificationModel "github.com/architagr/common-models/sns-notification"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 	"github.com/aws/jsii-runtime-go"
 )
 
+type INotification interface {
+	SendUrlNotificationToScrapper(search *searchcondition.SearchCondition, hostname constants.HostName, joblinks []string) error
+}
 type Notification struct {
-	sns *sns.SNS
+	snsObj snsiface.SNSAPI
+	env    config.IConfig
 }
 
-var notification *Notification
+var notification INotification
 
-func InitNotificationService() {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
-	svc := sns.New(sess)
+func InitNotificationService(snsObj snsiface.SNSAPI, env config.IConfig) INotification {
 	notification = &Notification{
-		sns: svc,
-	}
-}
-
-func GetNotificationObj() *Notification {
-	if notification == nil {
-		InitNotificationService()
+		snsObj: snsObj,
+		env:    env,
 	}
 	return notification
 }
-func (notify *Notification) SendUrlNotificationToScrapper(search *searchcondition.SearchCondition, hostname constants.HostName, joblinks []string) {
+
+func GetNotificationObj() (INotification, error) {
+	if notification == nil {
+		return nil, fmt.Errorf("notification has not been initilized")
+	}
+	return notification, nil
+}
+func (notify *Notification) SendUrlNotificationToScrapper(search *searchcondition.SearchCondition, hostname constants.HostName, joblinks []string) error {
+	var errObj error
 	for _, url := range joblinks {
 		bytes, _ := json.Marshal(notificationModel.Notification[string]{
 			SearchCondition: *search,
@@ -44,7 +48,7 @@ func (notify *Notification) SendUrlNotificationToScrapper(search *searchconditio
 			Data:            url,
 		})
 		env := config.GetConfig()
-		_, err := notify.sns.Publish(&sns.PublishInput{
+		_, err := notify.snsObj.Publish(&sns.PublishInput{
 			Message: aws.String(string(bytes)),
 			MessageAttributes: map[string]*sns.MessageAttributeValue{
 				"hostName": {
@@ -56,6 +60,8 @@ func (notify *Notification) SendUrlNotificationToScrapper(search *searchconditio
 		})
 		if err != nil {
 			log.Printf("error while sending notification, %+v", err)
+			errObj = err
 		}
 	}
+	return errObj
 }
