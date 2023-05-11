@@ -12,7 +12,7 @@ endif
 
 build:
 	make -C ../orchestration-lambda lambda-build
-	make -C ../webcrawler lambda-build
+	make -C ../jobcrawler lambda-build
 	make -C ../scrapper lambda-build
 	make -C ../database-lambda lambda-build
 	make -C ../monitor-queues-lambda lambda-build
@@ -20,7 +20,7 @@ build:
 
 clear:
 	make -C ../orchestration-lambda clear
-	make -C ../webcrawler clear
+	make -C ../jobcrawler clear
 	make -C ../scrapper clear
 	make -C ../database-lambda clear
 	make -C ../monitor-queues-lambda clear

@@ -37,7 +37,7 @@ func NewCrawlerLambdaStack(scope constructs.Construct, id string, props *Crawler
 			Environment:  &env,
 			Runtime:      awslambda.Runtime_GO_1_X(),
 			Handler:      jsii.String("webcrawler"),
-			Code:         awslambda.Code_FromAsset(jsii.String("./../webcrawler/main.zip"), &awss3assets.AssetOptions{}),
+			Code:         awslambda.Code_FromAsset(jsii.String("./../jobcrawler/main.zip"), &awss3assets.AssetOptions{}),
 			FunctionName: jsii.String(fmt.Sprintf("%s-crawler-lambda-fn", hostName)),
 			Timeout:      awscdk.Duration_Seconds(jsii.Number(5)),
 		})
