@@ -1,0 +1,52 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: run tests
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.20.4]
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Go
+        if: success()
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          cd orchestration-lambda
+          go test ./... -v -covermode=count
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        if: success()
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20.4
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Calc coverage
+        run: |
+          cd orchestration-lambda
+          go test `go list ./... | grep -v examples` -coverprofile=../orchestration-coverage.txt -covermode=atomic
+      - name: print file
+        run: echo $(cat ./orchestration-coverage.txt)
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          token: 947db02d-7752-41fe-8902-a084b0a8e39a
+          files: ./orchestration-coverage.txt
+          flags: unittests
+          name: codecov-umbrella

@@ -1,3 +1,6 @@
+
+[![codecov](https://codecov.io/github/architagr/jobcrawler/branch/main/graph/badge.svg?token=1CODHMCRR8)](https://codecov.io/github/architagr/jobcrawler)
+
 # Job Crawler
 
 This project is intended to crawl jobs from different potals and have them in database.
