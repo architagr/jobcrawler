@@ -19,10 +19,10 @@ type LinkedinCrawler struct {
 	logger       *log.Logger
 	errorLinks   []string
 	retryCount   int
-	notification *notification.Notification
+	notification notification.INotification
 }
 
-func InitLinkedInCrawler(search searchcondition.SearchCondition, notification *notification.Notification) ICrawler {
+func InitLinkedInCrawler(search searchcondition.SearchCondition, notification notification.INotification) ICrawler {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.linkedin.com", "linkedin.com"),
 		constants.UserAgent,

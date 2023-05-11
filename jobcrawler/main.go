@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	localAws "jobcrawler/aws"
 	"jobcrawler/config"
 	"jobcrawler/crawler"
 	"jobcrawler/notification"
+
 	"log"
 
 	"github.com/architagr/common-constants/constants"
@@ -25,7 +27,9 @@ func main() {
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 
 	log.Printf("lambda handler start")
-	notify := notification.GetNotificationObj()
+	snsSvc := localAws.GetSnsService()
+
+	notify := notification.InitNotificationService(snsSvc, config.GetConfig())
 	for _, message := range sqsEvent.Records {
 		data := new(sqs_message.MessageBody)
 		log.Printf("MessageBody %s", data)
@@ -40,7 +44,7 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 	return nil
 }
 
-func getCrawlerObj(hostName constants.HostName, searchParams *searchcondition.SearchCondition, notifier *notification.Notification) crawler.ICrawler {
+func getCrawlerObj(hostName constants.HostName, searchParams *searchcondition.SearchCondition, notifier notification.INotification) crawler.ICrawler {
 	var crawlerObj crawler.ICrawler
 	switch hostName {
 	case constants.HostName_Linkedin:
