@@ -12,7 +12,8 @@
           "program": "${workspaceFolder}/main.go",
           "args": [], 
           "env": {
-            "ScrapperSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:scrapper-sns-topic"
+            "ScrapperSnsTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:scrapper-sns-topic",
+            "IslocalEnvKey":"true"
           },
           "showLog": true
     }
