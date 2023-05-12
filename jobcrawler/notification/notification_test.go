@@ -11,24 +11,12 @@ import (
 )
 
 func TestNotificationObjectCreation(t *testing.T) {
-
-	t.Run("test notification object creation", func(tb *testing.T) {
-
-		_, err := GetNotificationObj()
-
-		if err == nil {
-			tb.Errorf("notification service was initilized without calling init method")
-		}
-	})
-
 	t.Run("test notification object creation", func(tb *testing.T) {
 		snsSvc := new(mockSNSClient)
 		env := new(mockConfig)
-		InitNotificationService(snsSvc, env)
+		notify := InitNotificationService(snsSvc, env, constants.HostName_Linkedin, searchcondition.SearchCondition{})
 
-		_, err := GetNotificationObj()
-
-		if err != nil {
+		if notify == nil {
 			tb.Errorf("notification service was not initilized")
 		}
 	})
@@ -38,18 +26,12 @@ func TestNotificationObjectCreation(t *testing.T) {
 func TestNotificationSuccess(t *testing.T) {
 	snsSvc := new(mockSNSClient)
 	env := new(mockConfig)
-	InitNotificationService(snsSvc, env)
+	notify := InitNotificationService(snsSvc, env, constants.HostName_Linkedin, searchcondition.SearchCondition{})
 
-	t.Run("test notification send notification to Monitoring sns", func(tb *testing.T) {
-		notify, err := GetNotificationObj()
-
-		if err != nil {
-			tb.Errorf("notification service was not initilized")
-		}
-
-		err = notify.SendUrlNotificationToScrapper(new(searchcondition.SearchCondition), constants.HostName_Linkedin, []string{"link1"})
+	t.Run("test notification send notification to scrapper sns", func(tb *testing.T) {
+		err := notify.SendUrlNotificationToScrapper([]string{"link1"})
 		if err != nil || snsSvc.PublishCallCount() != 1 {
-			tb.Errorf("notification service was not able to publish notification to monitoring sns")
+			tb.Errorf("notification service was not able to publish notification to scrapper sns")
 		}
 	})
 
@@ -58,18 +40,13 @@ func TestNotificationSuccess(t *testing.T) {
 func TestNotificationPublicFail(t *testing.T) {
 	snsSvc := new(mockSNSClientError)
 	env := new(mockConfig)
-	InitNotificationService(snsSvc, env)
+	notify := InitNotificationService(snsSvc, env, constants.HostName_Linkedin, searchcondition.SearchCondition{})
 
-	t.Run("test notification does not send notification to Monitoring sns", func(tb *testing.T) {
-		notify, err := GetNotificationObj()
+	t.Run("test notification does not send notification to scrapper sns", func(tb *testing.T) {
 
-		if err != nil {
-			tb.Errorf("notification service was not initilized")
-		}
-
-		err = notify.SendUrlNotificationToScrapper(new(searchcondition.SearchCondition), constants.HostName_Linkedin, []string{"link1"})
+		err := notify.SendUrlNotificationToScrapper([]string{"link1"})
 		if err == nil {
-			tb.Errorf("notification service was able to publish notification to monitoring sns with invalid topic")
+			tb.Errorf("notification service was able to publish notification to scrapper sns with invalid topic")
 		}
 	})
 }
@@ -108,4 +85,8 @@ type mockConfig struct {
 
 func (e *mockConfig) GetScrapperSnsTopicArn() string {
 	return "databaseConnectionString"
+}
+
+func (e *mockConfig) IsLocal() bool {
+	return true
 }
