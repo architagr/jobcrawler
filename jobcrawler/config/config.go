@@ -10,7 +10,7 @@ type IConfig interface {
 	GetScrapperSnsTopicArn() string
 	IsLocal() bool
 }
-type Config struct {
+type config struct {
 	scrapperSnsTopic string
 	isLocal          bool
 }
@@ -23,7 +23,7 @@ const (
 
 func InitConfig() IConfig {
 	_, ok := os.LookupEnv(constants.IsLocalEnvKey)
-	env = &Config{
+	env = &config{
 		scrapperSnsTopic: os.Getenv(scrapperSnsTopicArnKey),
 		isLocal:          ok,
 	}
@@ -37,10 +37,10 @@ func GetConfig() IConfig {
 	return env
 }
 
-func (e *Config) GetScrapperSnsTopicArn() string {
+func (e *config) GetScrapperSnsTopicArn() string {
 	return e.scrapperSnsTopic
 }
 
-func (e *Config) IsLocal() bool {
+func (e *config) IsLocal() bool {
 	return e.isLocal
 }

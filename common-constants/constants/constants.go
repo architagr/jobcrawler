@@ -1,6 +1,10 @@
 package constants
 
-import "github.com/gocolly/colly/v2"
+import (
+	"regexp"
+
+	"github.com/gocolly/colly/v2"
+)
 
 type HostName string
 type JobType string
@@ -81,4 +85,8 @@ var (
 
 var AllowedDomains map[HostName][]string = map[HostName][]string{
 	HostName_Linkedin: {"www.linkedin.com", "linkedin.com"},
+}
+
+var ScrapperFilterUrl map[HostName]*regexp.Regexp = map[HostName]*regexp.Regexp{
+	HostName_Linkedin: regexp.MustCompile("^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com"),
 }
