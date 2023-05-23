@@ -8,25 +8,6 @@ on:
 
 name: run tests
 jobs:
-  test:
-    strategy:
-      matrix:
-        go-version: [1.20.4]
-        platform: [ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - name: Install Go
-        if: success()
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go-version }}
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Run tests
-        run: |
-          cd orchestration-lambda
-          go test ./... -v -covermode=count
-
   coverage:
     runs-on: ubuntu-latest
     steps:
@@ -41,10 +22,11 @@ jobs:
         run: |
           make -C orchestration-lambda test
           make -C jobcrawler test
+          make -C scrapper test
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
           token: 947db02d-7752-41fe-8902-a084b0a8e39a
-          files: ./orchestration_coverage.txt,./jobcrawler_coverage.txt
+          files: ./orchestration_coverage.txt,./jobcrawler_coverage.txt,./scrapper_coverage.txt
           flags: unittests
           name: codecov-umbrella

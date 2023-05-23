@@ -13,6 +13,7 @@
             "args": [], 
             "env": {
                 "DatabaseSNSTopicArn":"arn:aws:sns:ap-southeast-1:638580160310:database-sns-topic",
+                "IslocalEnvKey":"true"
             },
             "showLog": true
         }
