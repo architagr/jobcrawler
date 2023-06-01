@@ -1,6 +1,6 @@
 package searchcondition
 
-import "github.com/architagr/common-constants/constants"
+import "common-constants/constants"
 
 type Location struct {
 	Country string `bson:"country,omitempty" json:"country,omitempty"`

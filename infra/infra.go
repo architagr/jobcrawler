@@ -19,7 +19,8 @@ import (
 	"infra/scrappersns"
 	"infra/scrappersqs"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 
 	"github.com/aws/jsii-runtime-go"

@@ -9,7 +9,8 @@ import (
 	"switchtablename/config"
 	"time"
 
-	"github.com/architagr/repository/connection"
+	"repository/connection"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	_ "github.com/aws/aws-lambda-go/lambda"

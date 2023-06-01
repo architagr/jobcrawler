@@ -4,7 +4,8 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/architagr/repository/connection"
+	"repository/connection"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

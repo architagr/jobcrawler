@@ -1,10 +1,10 @@
-module github.com/architagr/common-models
+module common-models
 
 go 1.20
 
-replace github.com/architagr/common-constants => ./../common-constants
+replace common-constants => ./../common-constants
 
-require github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
+require common-constants v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect

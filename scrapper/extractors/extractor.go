@@ -5,9 +5,10 @@ import (
 	"regexp"
 	"scrapper/notification"
 
-	"github.com/architagr/common-constants/constants"
-	jobdetails "github.com/architagr/common-models/job-details"
-	searchcondition "github.com/architagr/common-models/search-condition"
+	"common-constants/constants"
+
+	jobdetails "common-models/job-details"
+	searchcondition "common-models/search-condition"
 )
 
 type IExtractor interface {

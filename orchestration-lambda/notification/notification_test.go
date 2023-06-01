@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/architagr/common-constants/constants"
-	searchcondition "github.com/architagr/common-models/search-condition"
+	"common-constants/constants"
+
+	searchcondition "common-models/search-condition"
+
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 )

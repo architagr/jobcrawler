@@ -3,14 +3,14 @@ module infra
 go 1.18
 
 require (
-	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
+	common-constants v0.0.0-00010101000000-000000000000
 	github.com/aws/aws-cdk-go/awscdk/v2 v2.70.0
 	github.com/aws/aws-sdk-go v1.44.229
 	github.com/aws/constructs-go/constructs/v10 v10.1.270
 	github.com/aws/jsii-runtime-go v1.77.0
 )
 
-replace github.com/architagr/common-constants => /Users/architagarwal/code/jobcrawler/common-constants
+replace common-constants => /Users/architagarwal/code/jobcrawler/common-constants
 
 require (
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect

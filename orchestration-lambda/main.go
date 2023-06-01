@@ -10,7 +10,8 @@ import (
 	"orchestration-lambda/notification"
 	oschestrationService "orchestration-lambda/service"
 
-	"github.com/architagr/repository/connection"
+	"repository/connection"
+
 	"github.com/aws/aws-lambda-go/lambda"
 )
 

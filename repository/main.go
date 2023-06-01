@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	jobcrawlerlinks "github.com/architagr/common-models/job-crawler-links"
-	searchcondition "github.com/architagr/common-models/search-condition"
+	jobcrawlerlinks "common-models/job-crawler-links"
+	searchcondition "common-models/search-condition"
 
-	"github.com/architagr/common-constants/constants"
-	"github.com/architagr/repository/collection"
-	"github.com/architagr/repository/connection"
+	"common-constants/constants"
+	"repository/collection"
+	"repository/connection"
 )
 
 type Jobs struct {

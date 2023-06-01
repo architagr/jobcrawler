@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
 )
 
 type IConfig interface {

@@ -8,15 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/architagr/common-constants/constants"
-	jobdetails "github.com/architagr/common-models/job-details"
-	searchcondition "github.com/architagr/common-models/search-condition"
+	"common-constants/constants"
+
+	jobdetails "common-models/job-details"
+	searchcondition "common-models/search-condition"
 )
 
 var (
 	buff           bytes.Buffer
-	MockLogger              = log.New(&buff, "", 0)
-	allowedDomains []string = []string{"localhost", "127.0.0.1", "::1"}
+	MockLogger                    = log.New(&buff, "", 0)
+	allowedDomains *regexp.Regexp = regexp.MustCompile("^(http(s)?:\\/\\/)?([\\w]+\\.)?127.0.0.1")
 )
 
 type NotificationMock struct {
@@ -64,7 +65,7 @@ func TestExecuteExtractorService(t *testing.T) {
 		hostName := constants.HostName_Linkedin
 		notificationSvc := new(NotificationMock)
 
-		svc := InitExtractorService(hostName, regexp.MustCompile("^(http(s)?:\\/\\/)?([\\w]+\\.)?127.0.0.1"), MockLogger, notificationSvc)
+		svc := InitExtractorService(hostName, allowedDomains, MockLogger, notificationSvc)
 		svc.Start(testServer.URL, searchcondition.SearchCondition{})
 		logs := buff.String()
 		fmt.Println(logs)
@@ -79,7 +80,7 @@ func TestExecuteExtractorService(t *testing.T) {
 		hostName := constants.HostName_Linkedin
 		notificationSvc := new(NotificationMock)
 
-		svc := InitExtractorService(hostName, regexp.MustCompile("^(http(s)?:\\/\\/)?([\\w]+\\.)?127.0.0.1"), MockLogger, notificationSvc)
+		svc := InitExtractorService(hostName, allowedDomains, MockLogger, notificationSvc)
 		svc.Start(testServer.URL, searchcondition.SearchCondition{})
 		logs := buff.String()
 		fmt.Println(logs)

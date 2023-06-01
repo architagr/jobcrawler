@@ -5,8 +5,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/architagr/common-constants/constants"
-	jobdetails "github.com/architagr/common-models/job-details"
+	"common-constants/constants"
+
+	jobdetails "common-models/job-details"
+
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 )

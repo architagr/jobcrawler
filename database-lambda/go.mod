@@ -3,19 +3,18 @@ module database_lambda
 go 1.20
 
 require (
-	github.com/architagr/common-models v0.0.0-00010101000000-000000000000
-	github.com/architagr/repository v0.0.0-00010101000000-000000000000
+	common-models v0.0.0-00010101000000-000000000000
 	github.com/aws/aws-lambda-go v1.39.1
-
+	repository v0.0.0-00010101000000-000000000000
 )
 
 require (
+	common-constants v0.0.0-00010101000000-000000000000 // indirect
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/antchfx/htmlquery v1.3.0 // indirect
 	github.com/antchfx/xmlquery v1.3.15 // indirect
 	github.com/antchfx/xpath v1.2.3 // indirect
-	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocolly/colly/v2 v2.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -41,7 +40,7 @@ require (
 )
 
 replace (
-	github.com/architagr/common-constants => ./../common-constants
-	github.com/architagr/common-models => ./../common-models
-	github.com/architagr/repository => ./../repository
+	common-constants => ./../common-constants
+	common-models => ./../common-models
+	repository => ./../repository
 )
