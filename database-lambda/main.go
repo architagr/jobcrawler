@@ -3,8 +3,8 @@ package main
 import (
 	"common-constants/constants"
 	"context"
-	"database_lambda/config"
-	"database_lambda/persistance"
+	"database-lambda/config"
+	"database-lambda/persistance"
 	"encoding/json"
 	"fmt"
 	"log"

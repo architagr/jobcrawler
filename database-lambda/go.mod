@@ -1,4 +1,4 @@
-module database_lambda
+module database-lambda
 
 go 1.20
 

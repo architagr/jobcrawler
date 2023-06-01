@@ -2,7 +2,7 @@ package persistance
 
 import (
 	jobdetails "common-models/job-details"
-	"database_lambda/config"
+	"database-lambda/config"
 	"mongodbRepo/collection"
 )
 
