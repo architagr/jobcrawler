@@ -28,6 +28,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: 947db02d-7752-41fe-8902-a084b0a8e39a
-          files: ./orchestration_coverage.txt,./jobcrawler_coverage.txt,./scrapper_coverage.txt, ../database_coverage.txt
+          files: ./orchestration_coverage.txt,./jobcrawler_coverage.txt,./scrapper_coverage.txt,./database_coverage.txt
           flags: unittests
           name: codecov-umbrella
