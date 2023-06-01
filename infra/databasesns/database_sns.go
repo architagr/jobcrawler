@@ -1,7 +1,8 @@
 package databasesns
 
 import (
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awssns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awssnssubscriptions"

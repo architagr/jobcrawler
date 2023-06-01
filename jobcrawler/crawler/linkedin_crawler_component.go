@@ -4,7 +4,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
+
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/queue"
 )

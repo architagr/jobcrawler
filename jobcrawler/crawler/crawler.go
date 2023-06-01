@@ -4,7 +4,7 @@ import (
 	"jobcrawler/notification"
 	"log"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
 )
 
 type ICrawler interface {

@@ -6,9 +6,10 @@ import (
 	"log"
 	"orchestration-lambda/config"
 
-	"github.com/architagr/common-constants/constants"
-	searchcondition "github.com/architagr/common-models/search-condition"
-	notificationModel "github.com/architagr/common-models/sns-notification"
+	"common-constants/constants"
+	searchcondition "common-models/search-condition"
+	notificationModel "common-models/sns-notification"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"

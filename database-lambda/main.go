@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"log"
 
-	jobdetails "github.com/architagr/common-models/job-details"
-	notificationModel "github.com/architagr/common-models/sns-notification"
-	"github.com/architagr/repository/collection"
-	"github.com/architagr/repository/connection"
+	jobdetails "common-models/job-details"
+	notificationModel "common-models/sns-notification"
+	"repository/collection"
+	"repository/connection"
 
-	sqs_message "github.com/architagr/common-models/sqs-message"
+	sqs_message "common-models/sqs-message"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )

@@ -3,8 +3,8 @@ module scrapper
 go 1.20
 
 require (
-	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
-	github.com/architagr/common-models v0.0.0-00010101000000-000000000000
+	common-constants v0.0.0-00010101000000-000000000000
+	common-models v0.0.0-00010101000000-000000000000
 	github.com/aws/aws-lambda-go v1.39.1
 	github.com/aws/aws-sdk-go v1.44.229
 	github.com/aws/jsii-runtime-go v1.79.0
@@ -12,9 +12,8 @@ require (
 )
 
 replace (
-	github.com/architagr/common-constants => ./../common-constants
-	github.com/architagr/common-models => ./../common-models
-	github.com/architagr/repository => ./../repository
+	common-constants => ./../common-constants
+	common-models => ./../common-models
 )
 
 require (

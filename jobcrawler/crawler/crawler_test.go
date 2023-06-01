@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
 )
 
 var (

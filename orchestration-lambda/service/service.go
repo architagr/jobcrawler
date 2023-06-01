@@ -4,10 +4,10 @@ import (
 	"orchestration-lambda/config"
 	"orchestration-lambda/notification"
 
-	jobcrawlerlinks "github.com/architagr/common-models/job-crawler-links"
+	jobcrawlerlinks "common-models/job-crawler-links"
 
-	"github.com/architagr/repository/collection"
-	"github.com/architagr/repository/connection"
+	"repository/collection"
+	"repository/connection"
 )
 
 type IService interface {

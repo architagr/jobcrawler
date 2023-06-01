@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
 )
 
 var databaseSNSTopicArn = "databaseSNSTopicArn"

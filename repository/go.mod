@@ -1,16 +1,9 @@
-module github.com/architagr/repository
+module repository
 
 go 1.19
 
 require (
-	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
-	github.com/architagr/common-models v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.11.1
-)
-
-replace (
-	github.com/architagr/common-constants => ./../common-constants
-	github.com/architagr/common-models => ./../common-models
 )
 
 require (

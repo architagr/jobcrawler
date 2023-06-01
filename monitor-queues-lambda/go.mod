@@ -3,7 +3,7 @@ module monitorqueuelambda
 go 1.20
 
 require (
-	github.com/architagr/common-constants v0.0.0-00010101000000-000000000000
+	common-constants v0.0.0-00010101000000-000000000000
 	github.com/aws/aws-lambda-go v1.40.0
 	github.com/aws/aws-sdk-go v1.44.244
 	github.com/aws/jsii-runtime-go v1.80.0
@@ -36,4 +36,4 @@ require (
 	google.golang.org/protobuf v1.24.0 // indirect
 )
 
-replace github.com/architagr/common-constants => ./../common-constants
+replace common-constants => ./../common-constants

@@ -11,10 +11,11 @@ import (
 	extractor "scrapper/extractors"
 	"scrapper/notification"
 
-	"github.com/architagr/common-constants/constants"
-	searchcondition "github.com/architagr/common-models/search-condition"
-	notificationModel "github.com/architagr/common-models/sns-notification"
-	sqs_message "github.com/architagr/common-models/sqs-message"
+	"common-constants/constants"
+
+	searchcondition "common-models/search-condition"
+	notificationModel "common-models/sns-notification"
+	sqs_message "common-models/sqs-message"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"

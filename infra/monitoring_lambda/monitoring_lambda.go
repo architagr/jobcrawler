@@ -3,7 +3,8 @@ package monitoringlambda
 import (
 	"fmt"
 
-	"github.com/architagr/common-constants/constants"
+	"common-constants/constants"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"

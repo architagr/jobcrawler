@@ -1,4 +1,4 @@
-module github.com/architagr/common-constants
+module common-constants
 
 go 1.20
 
