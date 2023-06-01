@@ -9,7 +9,7 @@ import (
 	"switchtablename/config"
 	"time"
 
-	"repository/connection"
+	"mongodbRepo/connection"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
