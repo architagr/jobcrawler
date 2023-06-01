@@ -23,10 +23,11 @@ jobs:
           make -C orchestration-lambda test
           make -C jobcrawler test
           make -C scrapper test
+          make -C database-lambda test
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
           token: 947db02d-7752-41fe-8902-a084b0a8e39a
-          files: ./orchestration_coverage.txt,./jobcrawler_coverage.txt,./scrapper_coverage.txt
+          files: ./orchestration_coverage.txt,./jobcrawler_coverage.txt,./scrapper_coverage.txt, ../database_coverage.txt
           flags: unittests
           name: codecov-umbrella
