@@ -7,8 +7,8 @@ import (
 	searchcondition "common-models/search-condition"
 
 	"common-constants/constants"
-	"repository/collection"
-	"repository/connection"
+	"mongodbRepo/collection"
+	"mongodbRepo/connection"
 )
 
 type Jobs struct {

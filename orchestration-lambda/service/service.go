@@ -6,8 +6,8 @@ import (
 
 	jobcrawlerlinks "common-models/job-crawler-links"
 
-	"repository/collection"
-	"repository/connection"
+	"mongodbRepo/collection"
+	"mongodbRepo/connection"
 )
 
 type IService interface {

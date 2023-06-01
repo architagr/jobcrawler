@@ -3,7 +3,7 @@ module switchtablename
 go 1.20
 
 require (
-	repository v0.0.0-00010101000000-000000000000
+	mongodbRepo v0.0.0-00010101000000-000000000000
 	github.com/aws/aws-lambda-go v1.39.1
 	go.mongodb.org/mongo-driver v1.11.1
 
@@ -23,4 +23,4 @@ require (
 	golang.org/x/text v0.8.0 // indirect
 )
 
-replace repository => ./../repository
+replace mongodbRepo => ./../mongodbRepo

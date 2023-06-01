@@ -6,3 +6,6 @@ lambda-build:
 
 clear:
 	rm -f scrapper main.zip
+	
+test:
+	go test `go list ./... | grep -v examples` -coverprofile=../database_coverage.txt -covermode=atomic
