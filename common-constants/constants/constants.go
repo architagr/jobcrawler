@@ -12,7 +12,11 @@ type JobModel string
 type Role string
 type JobTitle string
 type ExperienceLevel string
+type DatabaseType string
 
+const (
+	DatabaseType_Mongodb = "MongoDb"
+)
 const (
 	HostName_Linkedin HostName = "linkedin"
 	HostName_Indeed   HostName = "indeed"

@@ -5,7 +5,7 @@ go 1.20
 require (
 	common-constants v0.0.0-00010101000000-000000000000
 	common-models v0.0.0-00010101000000-000000000000
-	repository v0.0.0-00010101000000-000000000000
+	mongodbRepo v0.0.0-00010101000000-000000000000
 	github.com/aws/aws-lambda-go v1.39.1
 	github.com/aws/aws-sdk-go v1.44.229
 	github.com/aws/jsii-runtime-go v1.80.0
@@ -52,5 +52,5 @@ require (
 replace (
 	common-constants => ./../common-constants
 	common-models => ./../common-models
-	repository => ./../repository
+	mongodbRepo => ./../mongodbRepo
 )

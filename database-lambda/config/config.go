@@ -1,14 +1,24 @@
 package config
 
-import "os"
+import (
+	"common-constants/constants"
+	"os"
+)
 
-type Config struct {
+type IConfig interface {
+	GetDatabaseConnectionString() string
+	GetDatabaseName() string
+	GetCollectionName() string
+	IsLocal() bool
+}
+type config struct {
 	databaseConnectionString string
 	databaseName             string
 	collectionName           string
+	isLocal                  bool
 }
 
-var env *Config
+var env IConfig
 
 const (
 	databaseConnectionStringKey = "DbConnectionString"
@@ -17,28 +27,34 @@ const (
 )
 
 func InitConfig() {
-	env = &Config{
+	_, ok := os.LookupEnv(constants.IsLocalEnvKey)
+	env = &config{
 		databaseConnectionString: os.Getenv(databaseConnectionStringKey),
 		databaseName:             os.Getenv(databaseNameKey),
 		collectionName:           os.Getenv(collectionNameKey),
+		isLocal:                  ok,
 	}
 }
 
-func GetConfig() *Config {
+func GetConfig() IConfig {
 	if env == nil {
 		InitConfig()
 	}
 	return env
 }
 
-func (e *Config) GetDatabaseConnectionString() string {
+func (e *config) GetDatabaseConnectionString() string {
 	return e.databaseConnectionString
 }
 
-func (e *Config) GetDatabaseName() string {
+func (e *config) GetDatabaseName() string {
 	return e.databaseName
 }
 
-func (e *Config) GetCollectionName() string {
+func (e *config) GetCollectionName() string {
 	return e.collectionName
+}
+
+func (e *config) IsLocal() bool {
+	return e.isLocal
 }
