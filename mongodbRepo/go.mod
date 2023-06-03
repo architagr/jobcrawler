@@ -3,7 +3,14 @@ module mongodbRepo
 go 1.20
 
 require (
+	common-constants v0.0.0-00010101000000-000000000000
+	common-models v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.11.1
+)
+
+replace (
+	common-constants => ./../common-constants
+	common-models => ./../common-models
 )
 
 require (
