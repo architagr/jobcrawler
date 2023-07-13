@@ -8,6 +8,7 @@ import (
 	databaselambda "infra/database_lambda"
 	"infra/databasesns"
 	"infra/databasesqs"
+	elasticsearchlambda "infra/elasticsearch_lambda"
 	monitoringlambda "infra/monitoring_lambda"
 	"infra/monitoringsns"
 	"infra/monitoringsqs"
@@ -123,6 +124,10 @@ func main() {
 	switchtablelambda.NewSwitchTableLambdaStack(app, "SwitchTableLambda", &switchtablelambda.SwitchLambdaLambdaStackProps{
 		StackProps:      stackProps,
 		DeadLetterQueue: monitoringDLQueue,
+	})
+
+	elasticsearchlambda.NewElasticSearchLambdaStack(app, "elasticSearchLambda", &elasticsearchlambda.ElasticSearchLambdaStackProps{
+		StackProps: stackProps,
 	})
 	//#endregion
 	app.Synth(nil)

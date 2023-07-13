@@ -2,16 +2,63 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 
+	_ "github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/core/search"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
+type Request struct {
+	FunctionName string `json:"functionName"`
+	Body         string `json:"body"`
+}
+type Response struct {
+	Data   string `json:"data"`
+	Status int    `json:"status"`
+}
+
+func ElasticSearch(ctx context.Context, req Request) (Response, error) {
+	log.Printf("request %+v", req)
+	return Response{Data: "Success", Status: 200}, nil
+}
+
 func main() {
+	// #region create a internal lambda
+	// lambda.Start(ElasticSearch)
+
+	// #endregion
+	// #region call another lambda function
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	data := Request{
+		FunctionName: "CreateIndex",
+		Body:         "body",
+	}
+	payload, _ := json.Marshal(data)
+	lambdaSvc := lambda.New(sess)
+	res, err := lambdaSvc.InvokeWithContext(context.TODO(), &lambda.InvokeInput{
+		FunctionName: aws.String("arn:aws:lambda:ap-southeast-1:638580160310:function:elasticsearch-lambda-fn"),
+		Payload:      payload,
+	})
+	if err != nil {
+		log.Panicln(err)
+	}
+	var responseBody Response
+	err = json.Unmarshal(res.Payload, &responseBody)
+	log.Printf("%+v", res)
+	log.Printf("%+v", responseBody)
+
+	return
+	// #endregion
 	//docker ps
 	// get container id if the es01
 	//docker cp <<containerid>>:/usr/share/elasticsearch/config/certs/ca/ca.crt .
