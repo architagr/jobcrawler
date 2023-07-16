@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"elasticsearchservice/logger"
+	"elasticsearchservice/services"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -16,6 +18,10 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
+var esConnection services.IESConnection
+var indexSvcObj services.IIndexService
+var logObj logger.ILogger
+
 type Request struct {
 	FunctionName string `json:"functionName"`
 	Body         string `json:"body"`
@@ -29,7 +35,20 @@ func ElasticSearch(ctx context.Context, req Request) (Response, error) {
 	log.Printf("request %+v", req)
 	return Response{Data: "Success", Status: 200}, nil
 }
-
+func InitLogger() {
+	logObj = logger.InitConsoleLogger()
+}
+func InitEsConnection() {
+	cert, _ := ioutil.ReadFile("ca.crt")
+	conn, err := services.InitEsConnection([]string{"https://localhost:9200"}, "elastic", "password123", cert)
+	if err != nil {
+		panic(err)
+	}
+	esConnection = conn
+}
+func InitService() {
+	indexSvcObj = services.InitIndexService(esConnection, logObj)
+}
 func main() {
 	// #region create a internal lambda
 	// lambda.Start(ElasticSearch)
