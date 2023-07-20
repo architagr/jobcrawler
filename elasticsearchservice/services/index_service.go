@@ -40,6 +40,9 @@ func (svc *indexService) Create(name string, mapping *types.TypeMapping) error {
 	return nil
 }
 func (svc *indexService) Delete(name string) error {
+	if ok, err := svc.Exists(name); !ok || err != nil {
+		return err
+	}
 	esSvc, err := svc.esConn.GetConnection()
 	if err != nil {
 		return err

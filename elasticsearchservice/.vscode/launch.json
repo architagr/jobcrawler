@@ -9,13 +9,13 @@
           "type": "go",
           "request": "launch", 
           "mode": "debug",
-          "program": "${workspaceFolder}/main.go",
+          "program": "${workspaceFolder}/api_main.go",
           "args": [], 
           "env": {
-            "DbConnectionString":"mongodb+srv://webscrapper:WebScrapper123@cluster0.xzvihm7.mongodb.net/?retryWrites=true&w=majority",
-            "DatabaseName":"webscrapper",
-            "CollectionName":"jobDetailsTemp",
-            "IslocalEnvKey":"true"
+            "ElasticSearchURLs":"https://localhost:9200",
+            "ElasticSearchUserName":"elastic",
+            "ElasticSearchPassword":"password123",
+            "CertificatePath":"ca.crt"
           },
           "showLog": true
     }

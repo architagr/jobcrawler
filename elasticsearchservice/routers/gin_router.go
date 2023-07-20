@@ -1,12 +1,13 @@
 package routers
 
 import (
-	"UserAPI/config"
-	"UserAPI/controller"
-	"UserAPI/logger"
-	middlewarePkg "UserAPI/middleware"
-	"UserAPI/models"
+	"elasticsearchservice/config"
+	"elasticsearchservice/controller"
+	"elasticsearchservice/logger"
+	"elasticsearchservice/models"
+
 	"context"
+	middlewarePkg "elasticsearchservice/middleware"
 	"errors"
 	"fmt"
 	"net/http"
@@ -40,7 +41,7 @@ func (router *ginRouter) StartApp(port int) {
 	}
 }
 
-func InitGinRouters(userController controller.IUserController, logObj logger.ILogger) IRouter {
+func InitGinRouters(indexController controller.IIndexController, logObj logger.ILogger) IRouter {
 	ginMiddleware = getMiddlewares()
 	ginEngine := gin.Default()
 	registerInitialCommonMiddleware(ginEngine, logObj)
@@ -48,10 +49,10 @@ func InitGinRouters(userController controller.IUserController, logObj logger.ILo
 
 	routerGroup.GET("/healthCheck", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "User api is working",
+			"message": "elasticsearch api is working",
 		})
 	})
-	createUserProfileRoutes(routerGroup, userController, logObj)
+	createIndexRoutes(routerGroup, indexController, logObj)
 	return &ginRouter{
 		ginEngine: ginEngine,
 		env:       config.GetConfig(),
@@ -59,12 +60,12 @@ func InitGinRouters(userController controller.IUserController, logObj logger.ILo
 	}
 }
 
-func createUserProfileRoutes(group *gin.RouterGroup, userController controller.IUserController, logObj logger.ILogger) {
-	userProfileGroup := group.Group("profile")
+func createIndexRoutes(group *gin.RouterGroup, indexController controller.IIndexController, logObj logger.ILogger) {
+	indexGroup := group.Group("index")
 
-	userProfileGroup.POST("/", func(ginContext *gin.Context) {
-		var userDetails models.UserDetail
-		if err := ginContext.ShouldBind(&userDetails); err != nil {
+	indexGroup.POST("/", func(ginContext *gin.Context) {
+		var req models.CreateIndexRequest
+		if err := ginContext.ShouldBind(&req); err != nil {
 			logObj.Printf("wrong request body %+v", err)
 			ginContext.Errors = append(ginContext.Errors, &gin.Error{
 				Err:  err,
@@ -72,7 +73,7 @@ func createUserProfileRoutes(group *gin.RouterGroup, userController controller.I
 			})
 			return
 		}
-		userData, err := userController.SaveUserProfile(&userDetails)
+		err := indexController.Create(req.Name, &req.Mapping)
 		if err != nil {
 			ginContext.Errors = append(ginContext.Errors, &gin.Error{
 				Err:  err,
@@ -80,28 +81,21 @@ func createUserProfileRoutes(group *gin.RouterGroup, userController controller.I
 			})
 			return
 		}
-		ginContext.JSON(http.StatusOK, userData)
+		ginContext.JSON(http.StatusCreated, map[string]string{
+			"status": fmt.Sprintf("index: %s created", req.Name),
+		})
 	})
-	userProfileGroup.PUT("/image/:id", func(ginContext *gin.Context) {
-
-		var updateAvatarRequest models.UpdateAvatarRequest
-		if err := ginContext.ShouldBind(&updateAvatarRequest); err != nil {
-			logObj.Printf("wrong request body %+v", err)
+	indexGroup.DELETE("/:name", func(ginContext *gin.Context) {
+		name, ok := ginContext.Params.Get("name")
+		if !ok {
+			logObj.Printf("name is required")
 			ginContext.Errors = append(ginContext.Errors, &gin.Error{
-				Err:  err,
+				Err:  errors.New("name is required"),
 				Type: gin.ErrorTypeBind,
 			})
 			return
 		}
-		if err := ginContext.ShouldBindUri(&updateAvatarRequest); err != nil {
-			logObj.Printf("wrong request param %+v", err)
-			ginContext.Errors = append(ginContext.Errors, &gin.Error{
-				Err:  err,
-				Type: gin.ErrorTypeBind,
-			})
-			return
-		}
-		err := userController.SaveUserImage(&updateAvatarRequest)
+		err := indexController.Delete(name)
 		if err != nil {
 			ginContext.Errors = append(ginContext.Errors, &gin.Error{
 				Err:  err,
@@ -110,21 +104,21 @@ func createUserProfileRoutes(group *gin.RouterGroup, userController controller.I
 			return
 		}
 		ginContext.JSON(http.StatusOK, map[string]string{
-			"message": "image uploaded",
+			"status": fmt.Sprintf("index: %s deleted", name),
 		})
 	})
 
-	userProfileGroup.GET("/:username", func(ginContext *gin.Context) {
-		email, ok := ginContext.Params.Get("username")
+	indexGroup.GET("/validate/:name", func(ginContext *gin.Context) {
+		name, ok := ginContext.Params.Get("name")
 		if !ok {
-			logObj.Printf("username is required")
+			logObj.Printf("name is required")
 			ginContext.Errors = append(ginContext.Errors, &gin.Error{
-				Err:  errors.New("username is required"),
+				Err:  errors.New("name is required"),
 				Type: gin.ErrorTypeBind,
 			})
 			return
 		}
-		userData, err := userController.GetUserProfile(email)
+		status, err := indexController.Exists(name)
 		if err != nil {
 			ginContext.Errors = append(ginContext.Errors, &gin.Error{
 				Err:  err,
@@ -132,16 +126,19 @@ func createUserProfileRoutes(group *gin.RouterGroup, userController controller.I
 			})
 			return
 		}
-		ginContext.JSON(http.StatusOK, userData)
+		ginContext.JSON(http.StatusOK, map[string]bool{
+			"status": status,
+		})
 	})
 
 }
 func getInitialRouteGroup(ginEngine *gin.Engine) *gin.RouterGroup {
-	return ginEngine.Group("/user")
+	return ginEngine.Group("/es")
 }
+
 func registerInitialCommonMiddleware(ginEngine *gin.Engine, logObj logger.ILogger) {
 	ginEngine.Use(ginMiddleware.GetErrorHandler(logObj))
-	ginEngine.Use(ginMiddleware.GetCorsMiddelware())
+	// ginEngine.Use(ginMiddleware.GetCorsMiddelware())
 }
 func getMiddlewares() middlewarePkg.IMiddleware[gin.HandlerFunc] {
 	return middlewarePkg.InitGinMiddelware()
